@@ -3,9 +3,10 @@ from unittest.mock import Mock
 import pytest
 from zeep.exceptions import Fault
 
-from fiskalhr.enums import ResponseErrorEnum
+from fiskalhr.enums import FetchScope, ResponseErrorEnum
 from fiskalhr.errors import ResponseError
 from fiskalhr.invoice import Invoice, InvoiceTip, InvoiceWithDoc
+from fiskalhr.oib import OIB
 from fiskalhr.ws import FiskalClient
 
 TEST_WSDL = "testdata/ws/wsdl/FiskalizacijaService.wsdl"
@@ -86,6 +87,10 @@ class TestFiskalClient:
             "prateciDokumenti",
             "promijeniNacPlac",
             "napojnice",
+            "prijaviRadnoVrijeme",
+            "brisiRadnoVrijeme",
+            "dohvatiRadnoVrijeme",
+            "prijaviRadnoVrijemeZaPoslovnice",
         }
 
         assert operations == expected_operations
@@ -256,3 +261,68 @@ class TestFiskalClient:
         srv.assert_called_once()
         assert srv.call_args.kwargs["PrateciDokument"] == doc.to_ws_object.return_value
         assert resp == srv.return_value.Jir
+
+    def test_submit_working_hours(self):
+        self.fc.client = Mock()
+        srv = Mock()
+        self.fc.client.service.prijaviRadnoVrijeme = srv
+        premises = Mock()
+
+        self.fc.submit_working_hours(premises)
+
+        premises.to_ws_object.assert_called_once_with(self.fc)
+        srv.assert_called_once()
+        assert (
+            srv.call_args.kwargs["PoslovniProstor"]
+            == premises.to_ws_object.return_value
+        )
+
+    def test_delete_working_hours(self):
+        self.fc.client = Mock()
+        srv = Mock()
+        self.fc.client.service.brisiRadnoVrijeme = srv
+        premises = Mock()
+
+        self.fc.delete_working_hours(premises)
+
+        premises.to_delete_ws_object.assert_called_once_with(self.fc)
+        srv.assert_called_once()
+        assert (
+            srv.call_args.kwargs["PoslovniProstor"]
+            == premises.to_delete_ws_object.return_value
+        )
+
+    def test_fetch_working_hours(self):
+        self.fc.client = Mock()
+        srv = Mock()
+        self.fc.client.service.dohvatiRadnoVrijeme = srv
+        oib = OIB("12312312316")
+        operator_oib = OIB("12312312316")
+
+        resp = self.fc.fetch_working_hours(oib, "POS01", FetchScope.ALL, operator_oib)
+
+        srv.assert_called_once()
+        assert srv.call_args.kwargs["Oib"] == oib
+        assert srv.call_args.kwargs["OznPosPr"] == "POS01"
+        assert srv.call_args.kwargs["VrstaRadnogVremena"] == FetchScope.ALL
+        assert srv.call_args.kwargs["OibOper"] == operator_oib
+        assert resp == srv.return_value
+
+    def test_submit_working_hours_batch(self):
+        self.fc.client = Mock()
+        self.fc.type_factory = Mock()
+        srv = Mock()
+        self.fc.client.service.prijaviRadnoVrijemeZaPoslovnice = srv
+        oib = OIB("12312312316")
+        operator_oib = OIB("12312312316")
+        p1 = Mock()
+        p2 = Mock()
+
+        resp = self.fc.submit_working_hours_batch(oib, [p1, p2], operator_oib)
+
+        p1.to_batch_ws_object.assert_called_once_with(self.fc)
+        p2.to_batch_ws_object.assert_called_once_with(self.fc)
+        srv.assert_called_once()
+        assert srv.call_args.kwargs["Oib"] == oib
+        assert srv.call_args.kwargs["OibOper"] == operator_oib
+        assert resp == srv.return_value
