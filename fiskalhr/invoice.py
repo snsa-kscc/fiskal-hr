@@ -703,6 +703,66 @@ class InvoicePaymentMethodChange(Invoice):
         return obj
 
 
+class InvoiceTip(Invoice):
+    """
+    Invoice data for tip (napojnica) registration
+
+    References a previously fiscalized invoice and adds tip amount
+    and payment method. Must be submitted within 2 days of the original invoice.
+    """
+
+    @property
+    def tip_amount(self) -> Optional[Decimal]:
+        """
+        Iznos nagrade za dobro obavljenu uslugu (napojnicu)
+
+        Required
+        """
+        return self._tip_amount
+
+    @tip_amount.setter
+    def tip_amount(self, amount: Decimal) -> None:
+        self._tip_amount = to_decimal2(amount)
+
+    @tip_amount.deleter
+    def tip_amount(self) -> None:
+        self._tip_amount = None
+
+    @property
+    def tip_payment_method(self) -> Optional[PaymentMethod]:
+        """
+        Način plaćanja nagrade za dobro obavljenu uslugu (napojnice)
+
+        Required
+        """
+        return self._tip_payment_method
+
+    @tip_payment_method.setter
+    def tip_payment_method(self, method: PaymentMethod) -> None:
+        self._tip_payment_method = method
+
+    @tip_payment_method.deleter
+    def tip_payment_method(self) -> None:
+        self._tip_payment_method = None
+
+    def get_ws_object_type(self) -> Any:
+        return self.client.type_factory.RacunNapojnicaType
+
+    def to_ws_object(self) -> Any:
+        if self.tip_amount is None:
+            raise ValueError("Tip amount must be set")
+
+        if self.tip_payment_method is None:
+            raise ValueError("Tip payment method must be set")
+
+        obj = super().to_ws_object()
+        obj.Napojnica = self.client.type_factory.NapojnicaType(
+            iznosNapojnice=self.tip_amount,
+            nacinPlacanjaNapojnice=self.tip_payment_method,
+        )
+        return obj
+
+
 class Document(BaseDocument):
     """
     Prateći dokument

@@ -14,7 +14,7 @@ from .errors import ResponseError
 from .signature import EnvelopedSignaturePlugin, Signer, Verifier
 
 if TYPE_CHECKING:
-    from .invoice import Document, Invoice, InvoicePaymentMethodChange
+    from .invoice import Document, Invoice, InvoicePaymentMethodChange, InvoiceTip
 
 
 class FiskalClient:
@@ -172,6 +172,15 @@ class FiskalClient:
     def change_payment_method(self, invoice: "InvoicePaymentMethodChange"):
         self._call_service(
             self.client.service.promijeniNacPlac,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                Racun=invoice.to_ws_object(),
+            ),
+        )
+
+    def submit_tip(self, invoice: "InvoiceTip"):
+        self._call_service(
+            self.client.service.napojnice,
             dict(
                 Zaglavlje=self.create_request_header(),
                 Racun=invoice.to_ws_object(),

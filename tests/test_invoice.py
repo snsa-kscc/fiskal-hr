@@ -12,6 +12,7 @@ from fiskalhr.invoice import (
     Invoice,
     InvoiceNumber,
     InvoicePaymentMethodChange,
+    InvoiceTip,
     InvoiceWithDoc,
 )
 from fiskalhr.item import Fee, TaxItem
@@ -651,3 +652,65 @@ def test_invoice_recipient_oib_rejects_wire_payment():
 
     with pytest.raises(ValueError, match="wire"):
         inv.to_ws_object()
+
+
+def test_tip_invoice_properties():
+    fc = Mock()
+    inv = InvoiceTip(fc, **TEST_INVOICE_PARAMS)
+
+    assert inv.tip_amount is None
+    assert inv.tip_payment_method is None
+
+    inv.tip_amount = 5
+    assert inv.tip_amount == Decimal("5.00")
+
+    inv.tip_payment_method = PaymentMethod.CASH
+    assert inv.tip_payment_method == PaymentMethod.CASH
+
+    del inv.tip_amount
+    assert inv.tip_amount is None
+
+    del inv.tip_payment_method
+    assert inv.tip_payment_method is None
+
+
+def test_tip_invoice_missing_amount():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+    fc.type_factory.RacunNapojnicaType = dict
+
+    inv = InvoiceTip(fc, **TEST_INVOICE_PARAMS)
+    inv.tip_payment_method = PaymentMethod.CASH
+
+    with pytest.raises(ValueError, match="Tip amount"):
+        inv.to_ws_object()
+
+
+def test_tip_invoice_missing_payment_method():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+    fc.type_factory.RacunNapojnicaType = dict
+
+    inv = InvoiceTip(fc, **TEST_INVOICE_PARAMS)
+    inv.tip_amount = 10
+
+    with pytest.raises(ValueError, match="Tip payment method"):
+        inv.to_ws_object()
+
+
+def test_tip_invoice_to_ws_object():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceTip(
+        fc,
+        tip_amount=Decimal("2.00"),
+        tip_payment_method=PaymentMethod.CARD,
+        **TEST_INVOICE_PARAMS,
+    )
+
+    obj = inv.to_ws_object()
+    assert obj.Napojnica == fc.type_factory.NapojnicaType(
+        iznosNapojnice=Decimal("2.00"),
+        nacinPlacanjaNapojnice=PaymentMethod.CARD,
+    )
