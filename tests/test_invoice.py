@@ -77,6 +77,7 @@ TEST_INVOICE_WS_OBJECT = {
     "ParagonBrRac": None,
     "OstaliPor": None,
     "SpecNamj": None,
+    "OibPrimateljaRacuna": None,
 }
 
 
@@ -616,4 +617,36 @@ def test_invoice_to_dict():
         "ParagonBrRac": None,
         "OstaliPor": None,
         "SpecNamj": None,
+        "OibPrimateljaRacuna": None,
     }
+
+
+def test_invoice_recipient_oib():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+    fc.type_factory.BrojRacunaType = dict
+    fc.type_factory.PdvType = dict
+    fc.type_factory.PorezType = dict
+    fc.type_factory.PorezNaPotrosnjuType = dict
+    fc.type_factory.NaknadaType = dict
+    fc.type_factory.RacunType = dict
+
+    inv = Invoice(fc, **TEST_INVOICE_PARAMS)
+    inv.recipient_oib = "12345678903"
+
+    ws_object = inv.to_ws_object()
+    assert ws_object["OibPrimateljaRacuna"] == OIB("12345678903")
+
+
+def test_invoice_recipient_oib_rejects_wire_payment():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+    fc.type_factory.BrojRacunaType = dict
+    fc.type_factory.RacunType = dict
+
+    inv = Invoice(fc, **TEST_INVOICE_PARAMS)
+    inv.recipient_oib = "12345678903"
+    inv.payment_method = PaymentMethod.WIRE
+
+    with pytest.raises(ValueError, match="wire"):
+        inv.to_ws_object()

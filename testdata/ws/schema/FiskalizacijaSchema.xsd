@@ -502,6 +502,15 @@
           </restriction>
         </simpleType>
       </element>
+      <element name="OibPrimateljaRacuna" type="tns:OibType" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            OIB primatelja racuna.
+            Dostavlja se samo za transakcije izmedju B2B koje se placaju gotovinom ili karticom
+            za koje se izdaje racun i provodi postupak fiskalizacije racuna.
+          </documentation>
+        </annotation>
+      </element>
     </sequence>
   </complexType>
 

@@ -410,6 +410,24 @@ class Invoice(BaseDocument):
         self._operator_oib = None
 
     @property
+    def recipient_oib(self) -> Optional[OIB]:
+        """
+        OIB primatelja računa
+
+        Optional. Only for B2B transactions paid by cash (G) or card (K).
+        Cannot be used with payment method T (wire/transakcijski račun).
+        """
+        return self._recipient_oib
+
+    @recipient_oib.setter
+    def recipient_oib(self, value: Union[OIB, str]) -> None:
+        self._recipient_oib = OIB(value)
+
+    @recipient_oib.deleter
+    def recipient_oib(self) -> None:
+        self._recipient_oib = None
+
+    @property
     def paragon_number(self) -> Optional[str]:
         """
         Oznaka paragon računa
@@ -446,6 +464,11 @@ class Invoice(BaseDocument):
         Returns:
             tns.RacunType object ready to be sent
         """
+
+        if self.recipient_oib and self.payment_method == PaymentMethod.WIRE:
+            raise ValueError(
+                "Payment method cannot be T (wire) when recipient OIB is set"
+            )
 
         # As a side-effect, this will verify there is minimal info
         # required for the invoice
@@ -516,6 +539,7 @@ class Invoice(BaseDocument):
             OstaliPor=None,
             # error v141: Polje 'Specifična namjena' je namijenjeno za buduće potrebe.
             SpecNamj=None,
+            OibPrimateljaRacuna=self.recipient_oib,
         )
 
     def get_qr_link(self, jir: Optional[str] = None):

@@ -4,3 +4,5 @@ __pycache__/
 htmlcov/
 dist/
 *.egg-info
+*.p12
+*.pem
