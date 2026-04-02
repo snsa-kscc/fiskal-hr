@@ -135,7 +135,7 @@ def test_verifer_ca_cert_load_fails():
 
 
 class TestVerifier:
-    def setup(self):
+    def setup_method(self):
         signer = Signer(
             "testdata/client_combined_encrypted_key.crt",
             password="testdata",
@@ -160,7 +160,7 @@ class TestVerifier:
 
 
 class TestEnvelopedSignaturePlugin:
-    def setup(self):
+    def setup_method(self):
         self.client = Mock()
         self.signer = Mock()
         self.verifier = Mock()

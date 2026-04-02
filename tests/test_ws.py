@@ -5,7 +5,7 @@ from zeep.exceptions import Fault
 
 from fiskalhr.enums import ResponseErrorEnum
 from fiskalhr.errors import ResponseError
-from fiskalhr.invoice import Invoice, InvoiceWithDoc
+from fiskalhr.invoice import Invoice, InvoiceTip, InvoiceWithDoc
 from fiskalhr.ws import FiskalClient
 
 TEST_WSDL = "testdata/ws/wsdl/FiskalizacijaService.wsdl"
@@ -71,7 +71,7 @@ def test_service_wsdl_not_found():
 
 
 class TestFiskalClient:
-    def setup(self):
+    def setup_method(self):
         self.fc = FiskalClient("testdata/root_ca.crt", TEST_WSDL, None, None)
 
     def test_wsdl_load_succeeds(self):
@@ -85,6 +85,7 @@ class TestFiskalClient:
             "racuniPD",
             "prateciDokumenti",
             "promijeniNacPlac",
+            "napojnice",
         }
 
         assert operations == expected_operations
@@ -225,6 +226,19 @@ class TestFiskalClient:
         invoice = Mock()
 
         self.fc.change_payment_method(invoice)
+
+        invoice.to_ws_object.assert_called_once()
+        srv.assert_called_once()
+        assert srv.call_args.kwargs["Racun"] == invoice.to_ws_object.return_value
+
+    def test_submit_tip(self):
+        self.fc.client = Mock()
+        srv = Mock()
+        self.fc.client.service.napojnice = srv
+        invoice = Mock()
+        invoice.__class__ = InvoiceTip
+
+        self.fc.submit_tip(invoice)
 
         invoice.to_ws_object.assert_called_once()
         srv.assert_called_once()
