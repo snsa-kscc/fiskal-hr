@@ -505,12 +505,14 @@ class Invoice(BaseDocument):
             ws_pnp = None
 
         if self.fees:
-            ws_naknade = [
-                self.client.type_factory.NaknadaType(
-                    NazivN=item.name, IznosN=item.amount
-                )
-                for item in self.fees
-            ]
+            ws_naknade = self.client.type_factory.NaknadeType(
+                Naknada=[
+                    self.client.type_factory.NaknadaType(
+                        NazivN=item.name, IznosN=item.amount
+                    )
+                    for item in self.fees
+                ]
+            )
         else:
             ws_naknade = None
 

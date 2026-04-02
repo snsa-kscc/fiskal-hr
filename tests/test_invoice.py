@@ -68,7 +68,7 @@ TEST_INVOICE_WS_OBJECT = {
     "IznosOslobPdv": Decimal("200.00"),
     "IznosMarza": Decimal("300.00"),
     "IznosNePodlOpor": Decimal("500.00"),
-    "Naknade": [{"NazivN": "Fee", "IznosN": Decimal("100.00")}],
+    "Naknade": {"Naknada": [{"NazivN": "Fee", "IznosN": Decimal("100.00")}]},
     "IznosUkupno": Decimal("314.16"),
     "NacinPlac": PaymentMethod.CASH,
     "OibOper": OIB("12345678903"),
@@ -374,6 +374,7 @@ def test_invoice_to_ws_object():
     fc.type_factory.PdvType = dict
     fc.type_factory.PorezType = dict
     fc.type_factory.PorezNaPotrosnjuType = dict
+    fc.type_factory.NaknadeType = dict
     fc.type_factory.NaknadaType = dict
     fc.type_factory.RacunType = dict
 
@@ -608,7 +609,7 @@ def test_invoice_to_dict():
         "IznosOslobPdv": "200.00",
         "IznosMarza": "300.00",
         "IznosNePodlOpor": "500.00",
-        "Naknade": [{"NazivN": "Fee", "IznosN": "100.00"}],
+        "Naknade": {"Naknada": [{"NazivN": "Fee", "IznosN": "100.00"}]},
         "IznosUkupno": "314.16",
         "NacinPlac": "G",
         "OibOper": "12345678903",
