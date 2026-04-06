@@ -17,7 +17,13 @@ if TYPE_CHECKING:
     from typing import List
 
     from .enums import FetchScope
-    from .invoice import Document, Invoice, InvoicePaymentMethodChange, InvoiceTip
+    from .invoice import (
+        Document,
+        Invoice,
+        InvoiceDataChange,
+        InvoicePaymentMethodChange,
+        InvoiceTip,
+    )
     from .oib import OIB
     from .premises import BusinessPremises
 
@@ -177,6 +183,22 @@ class FiskalClient:
     def change_payment_method(self, invoice: "InvoicePaymentMethodChange"):
         self._call_service(
             self.client.service.promijeniNacPlac,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                Racun=invoice.to_ws_object(),
+            ),
+        )
+
+    def change_invoice_data(self, invoice: "InvoiceDataChange"):
+        """
+        Change payment method and/or recipient OIB on a previously
+        fiscalized invoice (promijeniPodatkeRacuna).
+
+        This is the newer method that replaces change_payment_method,
+        supporting both payment method and recipient OIB changes.
+        """
+        self._call_service(
+            self.client.service.promijeniPodatkeRacuna,
             dict(
                 Zaglavlje=self.create_request_header(),
                 Racun=invoice.to_ws_object(),

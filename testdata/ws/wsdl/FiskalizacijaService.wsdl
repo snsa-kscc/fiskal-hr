@@ -56,6 +56,13 @@
     <wsdl:part element="fis:PromijeniNacPlacOdgovor" name="response"/>
   </wsdl:message>
 
+  <wsdl:message name="PromijeniPodatkeRacunaRequest">
+    <wsdl:part element="fis:PromijeniPodatkeRacunaZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="PromijeniPodatkeRacunaResponse">
+    <wsdl:part element="fis:PromijeniPodatkeRacunaOdgovor" name="response"/>
+  </wsdl:message>
+
   <wsdl:message name="NapojnicaRequest">
     <wsdl:part element="fis:NapojnicaZahtjev" name="request"/>
   </wsdl:message>
@@ -111,6 +118,10 @@
     <wsdl:operation name="promijeniNacPlac">
       <wsdl:input message="uis:PromijeniNacPlacRequest"/>
       <wsdl:output message="uis:PromijeniNacPlacResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="promijeniPodatkeRacuna">
+      <wsdl:input message="uis:PromijeniPodatkeRacunaRequest"/>
+      <wsdl:output message="uis:PromijeniPodatkeRacunaResponse"/>
     </wsdl:operation>
     <wsdl:operation name="napojnice">
       <wsdl:input message="uis:NapojnicaRequest"/>
@@ -178,6 +189,15 @@
     </wsdl:operation>
     <wsdl:operation name="promijeniNacPlac">
       <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/promijeniNacPlac"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="promijeniPodatkeRacuna">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/promijeniPodatkeRacuna"/>
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>

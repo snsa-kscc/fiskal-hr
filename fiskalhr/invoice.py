@@ -703,6 +703,98 @@ class InvoicePaymentMethodChange(Invoice):
         return obj
 
 
+class InvoiceDataChange(Invoice):
+    """
+    Invoice data for changing payment method and/or recipient OIB on a
+    previously fiscalized invoice (promijeniPodatkeRacuna).
+
+    See section 2.1.6 in the Fiskalizacija technical specification.
+    This is the newer method that supports changing both payment method
+    and recipient OIB, replacing the older payment-method-only change.
+    """
+
+    @property
+    def new_payment_method(self) -> Optional[PaymentMethod]:
+        """
+        Promijenjeni način plaćanja
+
+        Required
+        """
+        return self._new_payment_method
+
+    @new_payment_method.setter
+    def new_payment_method(self, method: PaymentMethod) -> None:
+        self._new_payment_method = method
+
+    @new_payment_method.deleter
+    def new_payment_method(self) -> None:
+        self._new_payment_method = None
+
+    @property
+    def original_zki(self) -> Optional[ZKI]:
+        """
+        Zaštitni kod izdavatelja (ZKI) sa izvornog računa
+
+        Required
+        """
+        return self._original_zki
+
+    @original_zki.setter
+    def original_zki(self, zki: ZKI) -> None:
+        self._original_zki = zki
+
+    @original_zki.deleter
+    def original_zki(self) -> None:
+        self._original_zki = None
+
+    @property
+    def new_recipient_oib(self) -> Optional[OIB]:
+        """
+        Promijenjeni OIB primatelja računa
+
+        Optional. Only for B2B transactions paid by cash (G) or card (K).
+        Send empty string or None if not changing the recipient OIB.
+        Cannot be used with payment method T (wire/transakcijski račun).
+        """
+        return self._new_recipient_oib
+
+    @new_recipient_oib.setter
+    def new_recipient_oib(self, value: Union[OIB, str]) -> None:
+        self._new_recipient_oib = OIB(value)
+
+    @new_recipient_oib.deleter
+    def new_recipient_oib(self) -> None:
+        self._new_recipient_oib = None
+
+    def get_ws_object_type(self) -> Any:
+        return self.client.type_factory.RacunPPRType
+
+    def to_ws_object(self) -> Any:
+        if not self.original_zki:
+            raise ValueError("Original ZKI must be set")
+
+        if not self.new_payment_method:
+            raise ValueError("New payment method must be set")
+
+        if (
+            self.new_payment_method == self.payment_method
+            and not self.new_recipient_oib
+        ):
+            raise ValueError("Must change at least payment method or recipient OIB")
+
+        if self.new_recipient_oib and self.new_payment_method == PaymentMethod.WIRE:
+            raise ValueError(
+                "New payment method cannot be T (wire) when new recipient OIB is set"
+            )
+
+        obj = super().to_ws_object(original_zki=self.original_zki)
+        obj.PromijenjeniNacinPlac = self.new_payment_method
+        obj.PromijenjeniOibPrimateljaRacuna = (
+            self.new_recipient_oib if self.new_recipient_oib else " "
+        )
+        return obj
+
+
 class InvoiceTip(Invoice):
     """
     Invoice data for tip (napojnica) registration

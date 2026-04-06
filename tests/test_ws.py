@@ -86,6 +86,7 @@ class TestFiskalClient:
             "racuniPD",
             "prateciDokumenti",
             "promijeniNacPlac",
+            "promijeniPodatkeRacuna",
             "napojnice",
             "prijaviRadnoVrijeme",
             "brisiRadnoVrijeme",
@@ -231,6 +232,18 @@ class TestFiskalClient:
         invoice = Mock()
 
         self.fc.change_payment_method(invoice)
+
+        invoice.to_ws_object.assert_called_once()
+        srv.assert_called_once()
+        assert srv.call_args.kwargs["Racun"] == invoice.to_ws_object.return_value
+
+    def test_change_invoice_data(self):
+        self.fc.client = Mock()
+        srv = Mock()
+        self.fc.client.service.promijeniPodatkeRacuna = srv
+        invoice = Mock()
+
+        self.fc.change_invoice_data(invoice)
 
         invoice.to_ws_object.assert_called_once()
         srv.assert_called_once()

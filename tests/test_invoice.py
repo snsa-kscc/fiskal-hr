@@ -10,6 +10,7 @@ from fiskalhr.enums import PaymentMethod, SequenceScope
 from fiskalhr.invoice import (
     Document,
     Invoice,
+    InvoiceDataChange,
     InvoiceNumber,
     InvoicePaymentMethodChange,
     InvoiceTip,
@@ -575,6 +576,131 @@ def test_payment_method_change_to_ws_object():
 
     obj = inv.to_ws_object()
     assert obj.PromijenjeniNacinPlac == PaymentMethod.CARD
+
+
+def test_empty_data_change():
+    fc = Mock()
+    inv = InvoiceDataChange(fc)
+
+    assert inv.new_payment_method is None
+    assert inv.original_zki is None
+    assert inv.new_recipient_oib is None
+
+
+def test_data_change_missing_original_zki_fails():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        new_payment_method=PaymentMethod.CARD,
+        **TEST_INVOICE_PARAMS,
+    )
+
+    with pytest.raises(ValueError):
+        inv.to_ws_object()
+
+
+def test_data_change_missing_new_method_fails():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        original_zki=ZKI("abcd" * 8),
+        **TEST_INVOICE_PARAMS,
+    )
+
+    with pytest.raises(ValueError):
+        inv.to_ws_object()
+
+
+def test_data_change_same_method_no_oib_fails():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        new_payment_method=PaymentMethod.CASH,
+        original_zki=ZKI("abcd" * 8),
+        **TEST_INVOICE_PARAMS,
+    )
+
+    with pytest.raises(ValueError, match="Must change at least"):
+        inv.to_ws_object()
+
+
+def test_data_change_same_method_with_oib_succeeds():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        new_payment_method=PaymentMethod.CASH,
+        original_zki=ZKI("abcd" * 8),
+        new_recipient_oib="12345678903",
+        **TEST_INVOICE_PARAMS,
+    )
+
+    obj = inv.to_ws_object()
+    assert obj.PromijenjeniNacinPlac == PaymentMethod.CASH
+    assert obj.PromijenjeniOibPrimateljaRacuna == OIB("12345678903")
+
+
+def test_data_change_wire_with_new_oib_fails():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        new_payment_method=PaymentMethod.WIRE,
+        original_zki=ZKI("abcd" * 8),
+        new_recipient_oib="12345678903",
+        payment_method=PaymentMethod.CASH,
+        **{k: v for k, v in TEST_INVOICE_PARAMS.items() if k != "payment_method"},
+    )
+
+    with pytest.raises(ValueError, match="wire"):
+        inv.to_ws_object()
+
+
+def test_data_change_to_ws_object():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        new_payment_method=PaymentMethod.CARD,
+        original_zki=ZKI("abcd" * 8),
+        **TEST_INVOICE_PARAMS,
+    )
+
+    obj = inv.to_ws_object()
+    assert obj.PromijenjeniNacinPlac == PaymentMethod.CARD
+    assert obj.PromijenjeniOibPrimateljaRacuna == " "
+
+
+def test_data_change_with_new_oib():
+    fc = Mock()
+    fc.signer.sign_zki_payload.return_value = "abcd" * 8
+
+    inv = InvoiceDataChange(
+        fc,
+        new_payment_method=PaymentMethod.CARD,
+        original_zki=ZKI("abcd" * 8),
+        new_recipient_oib="12345678903",
+        **TEST_INVOICE_PARAMS,
+    )
+
+    obj = inv.to_ws_object()
+    assert obj.PromijenjeniNacinPlac == PaymentMethod.CARD
+    assert obj.PromijenjeniOibPrimateljaRacuna == OIB("12345678903")
+
+
+def test_data_change_uses_ppr_type():
+    fc = Mock()
+    inv = InvoiceDataChange(fc)
+    assert inv.get_ws_object_type() == fc.type_factory.RacunPPRType
 
 
 def test_document():
