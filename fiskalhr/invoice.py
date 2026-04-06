@@ -410,6 +410,24 @@ class Invoice(BaseDocument):
         self._operator_oib = None
 
     @property
+    def recipient_oib(self) -> Optional[OIB]:
+        """
+        OIB primatelja računa
+
+        Optional. Only for B2B transactions paid by cash (G) or card (K).
+        Cannot be used with payment method T (wire/transakcijski račun).
+        """
+        return self._recipient_oib
+
+    @recipient_oib.setter
+    def recipient_oib(self, value: Union[OIB, str]) -> None:
+        self._recipient_oib = OIB(value)
+
+    @recipient_oib.deleter
+    def recipient_oib(self) -> None:
+        self._recipient_oib = None
+
+    @property
     def paragon_number(self) -> Optional[str]:
         """
         Oznaka paragon računa
@@ -447,6 +465,11 @@ class Invoice(BaseDocument):
             tns.RacunType object ready to be sent
         """
 
+        if self.recipient_oib and self.payment_method == PaymentMethod.WIRE:
+            raise ValueError(
+                "Payment method cannot be T (wire) when recipient OIB is set"
+            )
+
         # As a side-effect, this will verify there is minimal info
         # required for the invoice
         zki = self.calculate_zki()
@@ -482,12 +505,14 @@ class Invoice(BaseDocument):
             ws_pnp = None
 
         if self.fees:
-            ws_naknade = [
-                self.client.type_factory.NaknadaType(
-                    NazivN=item.name, IznosN=item.amount
-                )
-                for item in self.fees
-            ]
+            ws_naknade = self.client.type_factory.NaknadeType(
+                Naknada=[
+                    self.client.type_factory.NaknadaType(
+                        NazivN=item.name, IznosN=item.amount
+                    )
+                    for item in self.fees
+                ]
+            )
         else:
             ws_naknade = None
 
@@ -516,6 +541,7 @@ class Invoice(BaseDocument):
             OstaliPor=None,
             # error v141: Polje 'Specifična namjena' je namijenjeno za buduće potrebe.
             SpecNamj=None,
+            OibPrimateljaRacuna=self.recipient_oib,
         )
 
     def get_qr_link(self, jir: Optional[str] = None):
@@ -674,6 +700,158 @@ class InvoicePaymentMethodChange(Invoice):
 
         obj = super().to_ws_object(original_zki=self.original_zki)
         obj.PromijenjeniNacinPlac = self.new_payment_method
+        return obj
+
+
+class InvoiceDataChange(Invoice):
+    """
+    Invoice data for changing payment method and/or recipient OIB on a
+    previously fiscalized invoice (promijeniPodatkeRacuna).
+
+    See section 2.1.6 in the Fiskalizacija technical specification.
+    This is the newer method that supports changing both payment method
+    and recipient OIB, replacing the older payment-method-only change.
+    """
+
+    @property
+    def new_payment_method(self) -> Optional[PaymentMethod]:
+        """
+        Promijenjeni način plaćanja
+
+        Required
+        """
+        return self._new_payment_method
+
+    @new_payment_method.setter
+    def new_payment_method(self, method: PaymentMethod) -> None:
+        self._new_payment_method = method
+
+    @new_payment_method.deleter
+    def new_payment_method(self) -> None:
+        self._new_payment_method = None
+
+    @property
+    def original_zki(self) -> Optional[ZKI]:
+        """
+        Zaštitni kod izdavatelja (ZKI) sa izvornog računa
+
+        Required
+        """
+        return self._original_zki
+
+    @original_zki.setter
+    def original_zki(self, zki: ZKI) -> None:
+        self._original_zki = zki
+
+    @original_zki.deleter
+    def original_zki(self) -> None:
+        self._original_zki = None
+
+    @property
+    def new_recipient_oib(self) -> Optional[OIB]:
+        """
+        Promijenjeni OIB primatelja računa
+
+        Optional. Only for B2B transactions paid by cash (G) or card (K).
+        Send empty string or None if not changing the recipient OIB.
+        Cannot be used with payment method T (wire/transakcijski račun).
+        """
+        return self._new_recipient_oib
+
+    @new_recipient_oib.setter
+    def new_recipient_oib(self, value: Union[OIB, str]) -> None:
+        self._new_recipient_oib = OIB(value)
+
+    @new_recipient_oib.deleter
+    def new_recipient_oib(self) -> None:
+        self._new_recipient_oib = None
+
+    def get_ws_object_type(self) -> Any:
+        return self.client.type_factory.RacunPPRType
+
+    def to_ws_object(self) -> Any:
+        if not self.original_zki:
+            raise ValueError("Original ZKI must be set")
+
+        if not self.new_payment_method:
+            raise ValueError("New payment method must be set")
+
+        if (
+            self.new_payment_method == self.payment_method
+            and not self.new_recipient_oib
+        ):
+            raise ValueError("Must change at least payment method or recipient OIB")
+
+        if self.new_recipient_oib and self.new_payment_method == PaymentMethod.WIRE:
+            raise ValueError(
+                "New payment method cannot be T (wire) when new recipient OIB is set"
+            )
+
+        obj = super().to_ws_object(original_zki=self.original_zki)
+        obj.PromijenjeniNacinPlac = self.new_payment_method
+        obj.PromijenjeniOibPrimateljaRacuna = (
+            self.new_recipient_oib if self.new_recipient_oib else " "
+        )
+        return obj
+
+
+class InvoiceTip(Invoice):
+    """
+    Invoice data for tip (napojnica) registration
+
+    References a previously fiscalized invoice and adds tip amount
+    and payment method. Must be submitted within 2 days of the original invoice.
+    """
+
+    @property
+    def tip_amount(self) -> Optional[Decimal]:
+        """
+        Iznos nagrade za dobro obavljenu uslugu (napojnicu)
+
+        Required
+        """
+        return self._tip_amount
+
+    @tip_amount.setter
+    def tip_amount(self, amount: Decimal) -> None:
+        self._tip_amount = to_decimal2(amount)
+
+    @tip_amount.deleter
+    def tip_amount(self) -> None:
+        self._tip_amount = None
+
+    @property
+    def tip_payment_method(self) -> Optional[PaymentMethod]:
+        """
+        Način plaćanja nagrade za dobro obavljenu uslugu (napojnice)
+
+        Required
+        """
+        return self._tip_payment_method
+
+    @tip_payment_method.setter
+    def tip_payment_method(self, method: PaymentMethod) -> None:
+        self._tip_payment_method = method
+
+    @tip_payment_method.deleter
+    def tip_payment_method(self) -> None:
+        self._tip_payment_method = None
+
+    def get_ws_object_type(self) -> Any:
+        return self.client.type_factory.RacunNapojnicaType
+
+    def to_ws_object(self) -> Any:
+        if self.tip_amount is None:
+            raise ValueError("Tip amount must be set")
+
+        if self.tip_payment_method is None:
+            raise ValueError("Tip payment method must be set")
+
+        obj = super().to_ws_object()
+        obj.Napojnica = self.client.type_factory.NapojnicaType(
+            iznosNapojnice=self.tip_amount,
+            nacinPlacanjaNapojnice=self.tip_payment_method,
+        )
         return obj
 
 

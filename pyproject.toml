@@ -30,3 +30,10 @@ exclude_lines = ["if TYPE_CHECKING:"]
 [tool.pytest.ini_options]
 addopts = "-ra -q --cov=fiskalhr"
 pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "freezegun>=1.2.2",
+    "pytest>=7.0.1",
+    "pytest-cov>=4.0.0",
+]

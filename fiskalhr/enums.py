@@ -34,6 +34,60 @@ class SequenceScope(Enum):
         return self.value
 
 
+class DayOfWeek(Enum):
+    MONDAY = "1"
+    """Ponedjeljak"""
+
+    TUESDAY = "2"
+    """Utorak"""
+
+    WEDNESDAY = "3"
+    """Srijeda"""
+
+    THURSDAY = "4"
+    """Četvrtak"""
+
+    FRIDAY = "5"
+    """Petak"""
+
+    SATURDAY = "6"
+    """Subota"""
+
+    SUNDAY = "7"
+    """Nedjelja"""
+
+    HOLIDAY = "8"
+    """Praznik, državni blagdan"""
+
+    def __str__(self):
+        return self.value
+
+
+class EvenOdd(Enum):
+    EVEN = "P"
+    """Parni dani"""
+
+    ODD = "N"
+    """Neparni dani"""
+
+    def __str__(self):
+        return self.value
+
+
+class FetchScope(Enum):
+    REGULAR = "REDOVNO"
+    """Redovno radno vrijeme"""
+
+    EXCEPTIONS = "IZNIMKE"
+    """Iznimke radnog vremena"""
+
+    ALL = "SVE"
+    """Sve (redovno + iznimke)"""
+
+    def __str__(self):
+        return self.value
+
+
 class ResponseErrorEnum(Enum):
     @classmethod
     def from_code(cls, code: str) -> "ResponseErrorEnum":
@@ -313,6 +367,66 @@ class ResponseErrorEnum(Enum):
     LATE_INVOICE5 = "v153"
     """
     'Datum i vrijeme izdavanja' računa je za više od 5 dana manje od 'Datum i vrijeme obrade'.
+    """
+
+    # -- PREMISES WORKING HOURS --
+
+    PREMISES_WORKING_HOURS_REGISTERED = "p003"
+    """Uspješna dostava podataka radnog vremena poslovnog prostora."""
+
+    PREMISES_WORKING_HOURS_DELETED = "p004"
+    """Uspješna dostava podataka o brisanju radnog vremena poslovnog prostora."""
+
+    PREMISES_NOT_REGISTERED = "s101"
+    """
+    Oznaka poslovnog prostora ne postoji ili nije verificirana u aplikaciji
+    za prijavu poslovnih prostora.
+    """
+
+    PREMISES_CLOSED = "s102"
+    """Poslovni prostor je u statusu zatvoren ili privremeno zatvoren."""
+
+    PREMISES_DATE_OUT_OF_RANGE = "s103"
+    """
+    Datum od kojeg vrijedi redovno radno vrijeme mora biti veće od trenutnog
+    datuma i ne smije biti za više od 45 dana veće od trenutnog datuma.
+    """
+
+    PREMISES_DATE_GAP = "s104"
+    """
+    Datum od kojeg vrijedi pojedino redovno radno vrijeme mora biti veće od
+    trenutnog datuma i barem 1 dan razlike od prethodnog/narednog mu
+    redovnog radnog vremena.
+    """
+
+    PREMISES_DUPLICATE_DATE = "s105"
+    """
+    Datum od kojeg vrijedi redovno radno vrijeme je naveden više puta u
+    poruci zahtjeva.
+    """
+
+    PREMISES_DOUBLE_SHIFT_INCOMPLETE = "s106"
+    """
+    Za dvokratno redovno radno vrijeme moraju biti dostavljeni i prvi i drugi
+    dio radnog vremena barem za jedan dan.
+    """
+
+    PREMISES_DUPLICATE_REGULAR = "s107"
+    """
+    Već postoji redovno radno vrijeme koje vrijedi od {dd.mm.gggg.} kakvo je
+    dostavljeno u poruci.
+    """
+
+    PREMISES_EXCEPTION_DATE_OUT_OF_RANGE = "s108"
+    """
+    Datum iznimke ne može biti stariji od trenutnog datuma niti za više od dva
+    mjeseca iz budućnosti.
+    """
+
+    PREMISES_DUPLICATE_EXCEPTION = "s109"
+    """
+    Datum iznimke radnog vremena {dd.mm.gggg.} je naveden više puta u
+    poruci zahtjeva.
     """
 
     # -- ENUMS END --

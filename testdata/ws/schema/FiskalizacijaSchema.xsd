@@ -249,6 +249,108 @@
     </complexType>
   </element>
 
+  <element name="PromijeniPodatkeRacunaZahtjev">
+    <annotation>
+      <documentation>
+        Poruka prema web servisu za promjenu podataka racuna (nacin placanja i/ili OIB primatelja).
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
+        <element name="Racun" type="tns:RacunPPRType" minOccurs="1" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" >
+        <annotation>
+          <documentation>
+            Atribut za potrebe digitalnog potpisa, u njega se stavlja referentni na koji se referencira digitalni potpis.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="PromijeniPodatkeRacunaOdgovor">
+    <annotation>
+      <documentation>
+        Odgovor servisa za promjenu podataka racuna.
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
+        <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="0" maxOccurs="1" >
+          <annotation>
+            <documentation>
+              Poruka odgovora u slucaju uspjesne prijave promjene podataka racuna.
+            </documentation>
+          </annotation>
+        </element>
+        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" >
+        <annotation>
+          <documentation>
+            Atribut za potrebe digitalnog potpisa, u njega se stavlja referentni na koji se referencira digitalni potpis.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="NapojnicaZahtjev">
+    <annotation>
+      <documentation>
+        Zahtjev za evidentiranje nagrade za dobro obavljenu uslugu (napojnice).
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
+        <element name="Racun" type="tns:RacunNapojnicaType" minOccurs="1" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" >
+        <annotation>
+          <documentation>
+            Atribut za potrebe digitalnog potpisa, u njega se stavlja referentni na koji se referencira digitalni potpis.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="NapojnicaOdgovor">
+    <annotation>
+      <documentation>
+        Odgovor servisa za evidentiranje nagrade za dobro obavljenu uslugu (napojnice).
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
+        <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="0" maxOccurs="1" >
+          <annotation>
+            <documentation>
+              Poruka odgovora u slucaju uspjesnog evidentiranja napojnice.
+            </documentation>
+          </annotation>
+        </element>
+        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" >
+        <annotation>
+          <documentation>
+            Atribut za potrebe digitalnog potpisa, u njega se stavlja referentni na koji se referencira digitalni potpis.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="EchoRequest" type="string" nillable="false">
     <annotation>
       <documentation>Poruka echo metodi.</documentation>
@@ -501,6 +603,220 @@
             <maxLength value="1000" />
           </restriction>
         </simpleType>
+      </element>
+      <element name="OibPrimateljaRacuna" type="tns:OibType" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            OIB primatelja racuna.
+            Dostavlja se samo za transakcije izmedju B2B koje se placaju gotovinom ili karticom
+            za koje se izdaje racun i provodi postupak fiskalizacije racuna.
+          </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="NapojnicaType">
+    <sequence>
+      <element name="iznosNapojnice" type="tns:IznosType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Iznos nagrade za dobro obavljenu uslugu (napojnicu).
+          </documentation>
+        </annotation>
+      </element>
+      <element name="nacinPlacanjaNapojnice" type="tns:NacinPlacanjaType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Nacin placanja nagrade za dobro obavljenu uslugu (napojnice).
+          </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="RacunNapojnicaType">
+    <sequence>
+      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Osobni identifikacijski broj obveznika fiskalizacije.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="USustPdv" type="boolean" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            U sustavu PDV. Oznaka je li obveznik fiskalizacije u sustavu PDV ili nije.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="DatVrijeme" type="tns:DatumVrijemeType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Datum i vrijeme izdavanja racuna koji se ispisuju na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="OznSlijed" type="tns:OznakaSlijednostiType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Oznaka slijednosti izdavanja racuna. Slijednost izdavanja racuna moze biti na razini poslovnog prostora ili naplatnog uredjaja.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="BrRac" type="tns:BrojRacunaType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Broj racuna.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Pdv" type="tns:PdvType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Porez na dodanu vrijednost.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Pnp" type="tns:PorezNaPotrosnjuType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Porez na potrosnju.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="OstaliPor" type="tns:OstaliPoreziType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Ostali porezi.
+            Navode se ostali porezi koji se mogu pojaviti na racunu osim PDV-a i poreza na potrosnju.
+            Npr. porez na luksuz.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosOslobPdv" type="tns:IznosType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Iznos oslobodjenja na racunu.
+            Ako se isporucuju dobra ili obavljaju usluge koje su oslobodjene od placanja PDV-a,
+            potrebno je poslati ukupan iznos oslobodjenja na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosMarza" type="tns:IznosType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Iznos na koji se odnosi posebni postupka oporezivanja marze na racunu.
+            Marza za rabljena dobra, umjetnicka djela, kolekcionarske ili antikne predmete (clanak 22.a Zakona o PDV-u).
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosNePodlOpor" type="tns:IznosType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Iznos koji ne podlijeze oporezivanju na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Naknade" type="tns:NaknadeType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Naknade koje se mogu pojaviti na racunu tipa povratna naknada za ambalazu i sl.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosUkupno" type="tns:IznosType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Ukupan iznos koji se iskazuje na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="NacinPlac" type="tns:NacinPlacanjaType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Moguce vrijednosti su G - gotovina, K - kartice, C - cek,  T - transakcijski racun, O – ostalo.
+            U slucaju vise nacina placanja po jednom racunu, isto je potrebno prijaviti pod O - ostalo.
+            Za sve nacine placanja koji nisu propisani koristiti ce se oznaka O – ostalo.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Osobni identifikacijski broj operatera na naplatnom uredjaju koji izdaje racun.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="ZastKod" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+          Zastitni kod izdavatelja.
+          Zastitni kod izdavatelja obveznika fiskalizacije je alfanumericki zapis kojim se potvrdjuje veza izmedju obveznika fiskalizacije
+          i izdanog racuna. Zastitni kod generira obveznik fiskalizacije.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <pattern value="[a-f0-9]{32}"/>
+            <length value="32" />
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="NakDost" type="boolean" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Oznaka naknadne dostave racuna.
+            Obvezno se dostavlja u slucaju naknadne dostave racuna kad je isti prethodno izdan kupcu
+            bez JIR-a (prekid Internet veze ili potpuni prestanak rada naplatnog uredjaja).
+          </documentation>
+        </annotation>
+      </element>
+      <element name="ParagonBrRac" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Oznaka paragon racuna.
+            Obavezno se dostavlja u slucaju potpunog prestanka rada naplatnog uredjaja kada obveznik fiskalizacije
+            mora prepisati izdane paragon racune i prijaviti ih putem poruke Poreznoj upravi.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <minLength value="1" />
+            <maxLength value="100" />
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="SpecNamj" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Specificna namjena.
+            Predvidjeno za slucaj da se naknadno pojavi potreba za dostavom podataka koji nisu prepoznati tokom analize.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <minLength value="1" />
+            <maxLength value="1000" />
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="OibPrimateljaRacuna" type="tns:OibType" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            OIB primatelja racuna.
+            Dostavlja se samo za transakcije izmedju B2B koje se placaju gotovinom ili karticom
+            za koje se izdaje racun i provodi postupak fiskalizacije racuna.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Napojnica" type="tns:NapojnicaType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Podaci o nagradi za dobro obavljenu uslugu (napojnici).
+          </documentation>
+        </annotation>
       </element>
     </sequence>
   </complexType>
@@ -965,6 +1281,189 @@
     </sequence>
   </complexType>
 
+  <complexType name="RacunPPRType">
+    <annotation>
+      <documentation>
+        Tip podataka za promjenu podataka racuna (nacin placanja i/ili OIB primatelja racuna).
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Osobni identifikacijski broj obveznika fiskalizacije.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="USustPdv" type="boolean" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            U sustavu PDV. Oznaka je li obveznik fiskalizacije u sustavu PDV ili nije.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="DatVrijeme" type="tns:DatumVrijemeType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Datum i vrijeme izdavanja racuna koji se ispisuju na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="OznSlijed" type="tns:OznakaSlijednostiType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Oznaka slijednosti izdavanja racuna.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="BrRac" type="tns:BrojRacunaType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Broj racuna.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Pdv" type="tns:PdvType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Porez na dodanu vrijednost.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Pnp" type="tns:PorezNaPotrosnjuType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Porez na potrosnju.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="OstaliPor" type="tns:OstaliPoreziType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Ostali porezi.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosOslobPdv" type="tns:IznosType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Iznos oslobodjenja na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosMarza" type="tns:IznosType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Iznos na koji se odnosi posebni postupka oporezivanja marze na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosNePodlOpor" type="tns:IznosType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Iznos koji ne podlijeze oporezivanju na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Naknade" type="tns:NaknadeType" minOccurs="0" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Naknade koje se mogu pojaviti na racunu tipa povratna naknada za ambalazu i sl.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="IznosUkupno" type="tns:IznosType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Ukupan iznos koji se iskazuje na racunu.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="NacinPlac" type="tns:NacinPlacanjaType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Nacin placanja s izdanog racuna.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Osobni identifikacijski broj operatera na naplatnom uredjaju koji izdaje racun.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="ZastKod" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+          Zastitni kod izdavatelja.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <pattern value="[a-f0-9]{32}"/>
+            <length value="32" />
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="NakDost" type="boolean" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Oznaka naknadne dostave racuna.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="ParagonBrRac" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Oznaka paragon racuna.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <minLength value="1" />
+            <maxLength value="100" />
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="SpecNamj" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Specificna namjena.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <minLength value="1" />
+            <maxLength value="1000" />
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="OibPrimateljaRacuna" type="tns:OibType" minOccurs="0" maxOccurs="1">
+        <annotation>
+          <documentation>
+            OIB primatelja racuna s izdanog racuna.
+            Dostavlja se samo za transakcije izmedju B2B koje se placaju gotovinom ili karticom.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="PromijenjeniNacinPlac" type="tns:NacinPlacanjaType" minOccurs="1" maxOccurs="1" >
+        <annotation>
+          <documentation>
+            Promijenjeni nacin placanja.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="PromijenjeniOibPrimateljaRacuna" type="tns:OibType" minOccurs="1" maxOccurs="1">
+        <annotation>
+          <documentation>
+            Promijenjeni OIB primatelja racuna. Treba slati prazan element ili nonblank space ako se ne salje OIB u promjeni.
+          </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
   <simpleType name="OznakaSlijednostiType">
     <annotation>
       <documentation>
@@ -1338,5 +1837,299 @@
       <pattern value="\d*"></pattern>
     </restriction>
   </simpleType>
+
+  <simpleType name="String200Type">
+    <restriction base="string">
+      <maxLength value="200" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="String5Type">
+    <restriction base="string">
+      <minLength value="1" />
+      <maxLength value="5" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="DanUTjednuType">
+    <restriction base="string">
+      <pattern value="[1-8]" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="DioDvokratnogType">
+    <restriction base="string">
+      <pattern value="[12]" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="ParniNeparniType">
+    <restriction base="string">
+      <enumeration value="P" />
+      <enumeration value="N" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="VrstaRadnogVremenaType">
+    <restriction base="string">
+      <enumeration value="REDOVNO" />
+      <enumeration value="IZNIMKE" />
+      <enumeration value="SVE" />
+    </restriction>
+  </simpleType>
+
+  <complexType name="JednokratnoRVType">
+    <sequence>
+      <element name="DanUTjednu" type="tns:DanUTjednuType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="DvokratnoRVType">
+    <sequence>
+      <element name="DanUTjednu" type="tns:DanUTjednuType" minOccurs="1" maxOccurs="1" />
+      <element name="DioDvokratnog" type="tns:DioDvokratnogType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="ParniNeparniRVType">
+    <sequence>
+      <element name="DanUTjednu" type="tns:DanUTjednuType" minOccurs="1" maxOccurs="1" />
+      <element name="ParniNeparniDani" type="tns:ParniNeparniType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoDogovoruRVType">
+    <sequence>
+      <element name="RedovnoPoDogovoru" type="string" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="RedovnoRadnoVrijemeType">
+    <sequence>
+      <element name="DatumOd" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+      <element name="Napomena" type="tns:String200Type" minOccurs="0" maxOccurs="1" />
+      <choice>
+        <element name="PoDogovoru" type="tns:PoDogovoruRVType" minOccurs="1" maxOccurs="1" />
+        <element name="Jednokratno" type="tns:JednokratnoRVType" minOccurs="1" maxOccurs="unbounded" />
+        <element name="Dvokratno" type="tns:DvokratnoRVType" minOccurs="1" maxOccurs="unbounded" />
+        <element name="ParniNeparni" type="tns:ParniNeparniRVType" minOccurs="1" maxOccurs="unbounded" />
+      </choice>
+    </sequence>
+  </complexType>
+
+  <complexType name="JednokratnoIznimkaType">
+    <sequence>
+      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="DvokratnoIznimkaType">
+    <sequence>
+      <element name="DioDvokratnog" type="tns:DioDvokratnogType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="IznimkaRadnogVremenaType">
+    <sequence>
+      <element name="Datum" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+      <choice>
+        <element name="Jednokratno" type="tns:JednokratnoIznimkaType" minOccurs="1" maxOccurs="1" />
+        <element name="Dvokratno" type="tns:DvokratnoIznimkaType" minOccurs="1" maxOccurs="unbounded" />
+      </choice>
+    </sequence>
+  </complexType>
+
+  <complexType name="RadnoVrijemeType">
+    <sequence>
+      <element name="Redovno" type="tns:RedovnoRadnoVrijemeType" minOccurs="0" maxOccurs="3" />
+      <element name="Iznimke" type="tns:IznimkaRadnogVremenaType" minOccurs="0" maxOccurs="10" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoslovniProstorRVType">
+    <sequence>
+      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="1" maxOccurs="1" />
+      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="BrisanjeRedovnogType">
+    <sequence>
+      <element name="DatumOd" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="BrisanjeIznimkeType">
+    <sequence>
+      <element name="Datum" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="BrisanjeRadnogVremenaType">
+    <sequence>
+      <element name="Redovno" type="tns:BrisanjeRedovnogType" minOccurs="0" maxOccurs="3" />
+      <element name="Iznimke" type="tns:BrisanjeIznimkeType" minOccurs="0" maxOccurs="10" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoslovniProstorBrisanjeRVType">
+    <sequence>
+      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
+      <element name="BrisanjeRadnogVremena" type="tns:BrisanjeRadnogVremenaType" minOccurs="1" maxOccurs="1" />
+      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoslovnicaRVType">
+    <sequence>
+      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="0" maxOccurs="1" />
+      <element name="Redovno" type="tns:RedovnoRadnoVrijemeType" minOccurs="0" maxOccurs="1" />
+      <element name="Iznimke" type="tns:IznimkaRadnogVremenaType" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoslovniProstoriListaType">
+    <sequence>
+      <element name="Poslovnica" type="tns:PoslovnicaRVType" minOccurs="1" maxOccurs="100" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoslovnicaOdgovorType">
+    <sequence>
+      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
+      <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="0" maxOccurs="1" />
+      <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="PoslovniProstoriOdgovorListaType">
+    <sequence>
+      <element name="Poslovnica" type="tns:PoslovnicaOdgovorType" minOccurs="1" maxOccurs="100" />
+    </sequence>
+  </complexType>
+
+  <complexType name="DohvatRadnoVrijemeOdgovorType">
+    <sequence>
+      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="0" maxOccurs="1" />
+      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <!-- Prijava radnog vremena poslovnog prostora -->
+  <element name="PrijaviRadnoVrijemeZahtjev">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstor" type="tns:PoslovniProstorRVType" minOccurs="1" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <element name="PrijaviRadnoVrijemeOdgovor">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
+        <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="0" maxOccurs="1" />
+        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <!-- Brisanje radnog vremena poslovnog prostora -->
+  <element name="ObrisiRadnoVrijemeZahtjev">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstor" type="tns:PoslovniProstorBrisanjeRVType" minOccurs="1" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <element name="ObrisiRadnoVrijemeOdgovor">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
+        <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="0" maxOccurs="1" />
+        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <!-- Dohvat aktivnih radnih vremena poslovnog prostora -->
+  <element name="DohvatiRadnoVrijemeZahtjev">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
+        <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+        <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
+        <element name="VrstaRadnogVremena" type="tns:VrstaRadnogVremenaType" minOccurs="1" maxOccurs="1" />
+        <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <element name="DohvatiRadnoVrijemeOdgovor">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstor" type="tns:DohvatRadnoVrijemeOdgovorType" minOccurs="0" maxOccurs="1" />
+        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <!-- Prijava radnog vremena za listu poslovnih prostora -->
+  <element name="PrijaviRadnoVrijemeZaPoslovniceZahtjev">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
+        <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstori" type="tns:PoslovniProstoriListaType" minOccurs="1" maxOccurs="1" />
+        <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
+
+  <element name="PrijaviRadnoVrijemeZaPoslovniceOdgovor">
+    <complexType>
+      <sequence>
+        <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
+        <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstori" type="tns:PoslovniProstoriOdgovorListaType" minOccurs="0" maxOccurs="1" />
+        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="Id" type="string" />
+    </complexType>
+  </element>
 
 </schema>

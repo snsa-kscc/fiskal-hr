@@ -56,6 +56,48 @@
     <wsdl:part element="fis:PromijeniNacPlacOdgovor" name="response"/>
   </wsdl:message>
 
+  <wsdl:message name="PromijeniPodatkeRacunaRequest">
+    <wsdl:part element="fis:PromijeniPodatkeRacunaZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="PromijeniPodatkeRacunaResponse">
+    <wsdl:part element="fis:PromijeniPodatkeRacunaOdgovor" name="response"/>
+  </wsdl:message>
+
+  <wsdl:message name="NapojnicaRequest">
+    <wsdl:part element="fis:NapojnicaZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="NapojnicaResponse">
+    <wsdl:part element="fis:NapojnicaOdgovor" name="response"/>
+  </wsdl:message>
+
+  <wsdl:message name="PrijaviRadnoVrijemeRequest">
+    <wsdl:part element="fis:PrijaviRadnoVrijemeZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="PrijaviRadnoVrijemeResponse">
+    <wsdl:part element="fis:PrijaviRadnoVrijemeOdgovor" name="response"/>
+  </wsdl:message>
+
+  <wsdl:message name="BrisiRadnoVrijemeRequest">
+    <wsdl:part element="fis:ObrisiRadnoVrijemeZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="BrisiRadnoVrijemeResponse">
+    <wsdl:part element="fis:ObrisiRadnoVrijemeOdgovor" name="response"/>
+  </wsdl:message>
+
+  <wsdl:message name="DohvatiRadnoVrijemeRequest">
+    <wsdl:part element="fis:DohvatiRadnoVrijemeZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="DohvatiRadnoVrijemeResponse">
+    <wsdl:part element="fis:DohvatiRadnoVrijemeOdgovor" name="response"/>
+  </wsdl:message>
+
+  <wsdl:message name="PrijaviRadnoVrijemeZaPoslovniceRequest">
+    <wsdl:part element="fis:PrijaviRadnoVrijemeZaPoslovniceZahtjev" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="PrijaviRadnoVrijemeZaPoslovniceResponse">
+    <wsdl:part element="fis:PrijaviRadnoVrijemeZaPoslovniceOdgovor" name="response"/>
+  </wsdl:message>
+
   <wsdl:portType name="FiskalizacijaPortType">
     <wsdl:operation name="racuni">
       <wsdl:input message="uis:RacuniRequest"/>
@@ -77,9 +119,33 @@
       <wsdl:input message="uis:PromijeniNacPlacRequest"/>
       <wsdl:output message="uis:PromijeniNacPlacResponse"/>
     </wsdl:operation>
+    <wsdl:operation name="promijeniPodatkeRacuna">
+      <wsdl:input message="uis:PromijeniPodatkeRacunaRequest"/>
+      <wsdl:output message="uis:PromijeniPodatkeRacunaResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="napojnice">
+      <wsdl:input message="uis:NapojnicaRequest"/>
+      <wsdl:output message="uis:NapojnicaResponse"/>
+    </wsdl:operation>
     <wsdl:operation name="echo">
       <wsdl:input message="uis:EchoRequest"/>
       <wsdl:output message="uis:EchoResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="prijaviRadnoVrijeme">
+      <wsdl:input message="uis:PrijaviRadnoVrijemeRequest"/>
+      <wsdl:output message="uis:PrijaviRadnoVrijemeResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="brisiRadnoVrijeme">
+      <wsdl:input message="uis:BrisiRadnoVrijemeRequest"/>
+      <wsdl:output message="uis:BrisiRadnoVrijemeResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="dohvatiRadnoVrijeme">
+      <wsdl:input message="uis:DohvatiRadnoVrijemeRequest"/>
+      <wsdl:output message="uis:DohvatiRadnoVrijemeResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="prijaviRadnoVrijemeZaPoslovnice">
+      <wsdl:input message="uis:PrijaviRadnoVrijemeZaPoslovniceRequest"/>
+      <wsdl:output message="uis:PrijaviRadnoVrijemeZaPoslovniceResponse"/>
     </wsdl:operation>
   </wsdl:portType>
 
@@ -130,8 +196,62 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="promijeniPodatkeRacuna">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/promijeniPodatkeRacuna"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="napojnice">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/napojnice"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="echo">
       <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/echo"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="prijaviRadnoVrijeme">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/prijaviRadnoVrijeme"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="brisiRadnoVrijeme">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/brisiRadnoVrijeme"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="dohvatiRadnoVrijeme">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/dohvatiRadnoVrijeme"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="prijaviRadnoVrijemeZaPoslovnice">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/prijaviRadnoVrijemeZaPoslovnice"/>
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>

@@ -4,14 +4,47 @@ Python 3 package for integrating with Croatian tax authority
 [Fiskalizacija](https://www.porezna-uprava.hr/HR_Fiskalizacija/Stranice/FiskalizacijaNovo.aspx)
 service.
 
+Implements the [Fiskalizacija technical specification v2.6](https://www.porezna-uprava.hr/HR_Fiskalizacija/Stranice/Tehni%C4%8Dke-specifikacije.aspx).
+
 ## Scope
 
 The package provides full integration with the Fiskalizacija service, including:
 
+### Invoices
+
 * checking invoice details in test (DEMO) mode - `FiskalClient.check_invoice()`
 * submitting an invoice - `FiskalClient.submit_invoice()`
-* submitting a fiscalization document - `FiskalClient.submit_document()`
-* changing the payment method - `FiskalClient.change_payment_method()`
+* submitting an invoice with accompanying document (deprecated) - `FiskalClient.submit_invoice()` with `InvoiceWithDoc`
+* submitting a fiscalization document (deprecated) - `FiskalClient.submit_document()`
+* recipient OIB (`OibPrimateljaRacuna`) support for B2B cash/card transactions on `Invoice`
+
+### Payment method and invoice data changes
+
+* changing the payment method (legacy) - `FiskalClient.change_payment_method()` with `InvoicePaymentMethodChange`
+* changing payment method and/or recipient OIB (new) - `FiskalClient.change_invoice_data()` with `InvoiceDataChange`
+
+The newer `change_invoice_data()` method (spec section 2.1.6, `promijeniPodatkeRacuna`) supports
+changing both the payment method and the recipient OIB on a previously fiscalized invoice. It
+is the recommended method going forward; the legacy `change_payment_method()` only supports
+changing the payment method.
+
+### Tips (napojnice)
+
+* submitting a tip for a previously fiscalized invoice - `FiskalClient.submit_tip()` with `InvoiceTip`
+
+### Working hours (radno vrijeme poslovnog prostora)
+
+* registering working hours for a business premises - `FiskalClient.submit_working_hours()`
+* deleting working hours - `FiskalClient.delete_working_hours()`
+* fetching active working hours - `FiskalClient.fetch_working_hours()`
+* batch registration of working hours for multiple premises - `FiskalClient.submit_working_hours_batch()`
+
+> **Note:** In the demo environment, before you can test working hours operations, you must
+> request that Porezna Uprava opens test business premises on the OIB your DEMO certificate
+> is issued to. Submit a request via [Pišite nam](https://pisitenam.porezna-uprava.hr/)
+> selecting topic *Fiskalizacija u krajnjoj potrošnji (F1)* and subtopic *Tehnička podrška*.
+> Include the OIB from your DEMO certificate and the desired premises codes (oznake
+> poslovnih prostora) in the request.
 
 ## Requirements
 
@@ -69,6 +102,105 @@ You'll also need the `libxmlsec1` library installed on your computer.
 
     Note that this does only basic sanity checking. For example, it will not check if the
     point of sale location (code `X` in the invoice number in this example) is registered.
+
+## Usage examples
+
+### Submit an invoice with recipient OIB (B2B)
+
+```python
+from fiskalhr.enums import PaymentMethod, SequenceScope
+from fiskalhr.invoice import Invoice
+from fiskalhr.item import TaxItem
+
+invoice = Invoice(
+    fiskal_client,
+    oib="YOUR-OIB",
+    invoice_number="1/STORE1/1",
+    total=1250.00,
+    vat=[TaxItem(1000.00, 25, 250.00)],
+    is_vat_registered=True,
+    payment_method=PaymentMethod.CASH,
+    sequence_scope=SequenceScope.LOCATION,
+    recipient_oib="BUYER-OIB",  # B2B only, cash/card payments
+)
+
+jir = fiskal_client.submit_invoice(invoice)
+```
+
+### Change payment method and recipient OIB on a fiscalized invoice
+
+```python
+from fiskalhr.invoice import InvoiceDataChange
+
+change = InvoiceDataChange(
+    fiskal_client,
+    # original invoice data:
+    oib="YOUR-OIB",
+    issued_at=original_invoice.issued_at,
+    invoice_number="1/STORE1/1",
+    total=1250.00,
+    vat=[TaxItem(1000.00, 25, 250.00)],
+    is_vat_registered=True,
+    payment_method=PaymentMethod.CASH,
+    sequence_scope=SequenceScope.LOCATION,
+    original_zki=original_zki,
+    # changed data:
+    new_payment_method=PaymentMethod.CARD,
+    new_recipient_oib="BUYER-OIB",
+)
+
+fiskal_client.change_invoice_data(change)
+```
+
+### Submit a tip (napojnica)
+
+```python
+from fiskalhr.invoice import InvoiceTip
+
+tip = InvoiceTip(
+    fiskal_client,
+    # original invoice data:
+    oib="YOUR-OIB",
+    issued_at=original_invoice.issued_at,
+    invoice_number="1/STORE1/1",
+    total=1250.00,
+    vat=[TaxItem(1000.00, 25, 250.00)],
+    is_vat_registered=True,
+    payment_method=PaymentMethod.CASH,
+    sequence_scope=SequenceScope.LOCATION,
+    # tip data:
+    tip_amount=50.00,
+    tip_payment_method=PaymentMethod.CASH,
+)
+
+fiskal_client.submit_tip(tip)
+```
+
+### Register working hours for a business premises
+
+```python
+from fiskalhr.enums import DayOfWeek
+from fiskalhr.premises import BusinessPremises, SingleShiftHours, WorkingHoursRange
+
+premises = BusinessPremises(
+    oib="YOUR-OIB",
+    premises_code="STORE1",
+    working_hours=[
+        WorkingHoursRange(
+            DayOfWeek.MONDAY, DayOfWeek.FRIDAY,
+            time_from="08:00", time_to="20:00",
+        ),
+        SingleShiftHours(
+            DayOfWeek.SATURDAY,
+            time_from="09:00", time_to="14:00",
+        ),
+    ],
+    effective_date=date(2026, 1, 1),
+    operator_oib="OPERATOR-OIB",
+)
+
+fiskal_client.submit_working_hours(premises)
+```
 
 ## Testing
 

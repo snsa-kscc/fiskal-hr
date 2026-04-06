@@ -14,7 +14,18 @@ from .errors import ResponseError
 from .signature import EnvelopedSignaturePlugin, Signer, Verifier
 
 if TYPE_CHECKING:
-    from .invoice import Document, Invoice, InvoicePaymentMethodChange
+    from typing import List
+
+    from .enums import FetchScope
+    from .invoice import (
+        Document,
+        Invoice,
+        InvoiceDataChange,
+        InvoicePaymentMethodChange,
+        InvoiceTip,
+    )
+    from .oib import OIB
+    from .premises import BusinessPremises
 
 
 class FiskalClient:
@@ -175,6 +186,100 @@ class FiskalClient:
             dict(
                 Zaglavlje=self.create_request_header(),
                 Racun=invoice.to_ws_object(),
+            ),
+        )
+
+    def change_invoice_data(self, invoice: "InvoiceDataChange"):
+        """
+        Change payment method and/or recipient OIB on a previously
+        fiscalized invoice (promijeniPodatkeRacuna).
+
+        This is the newer method that replaces change_payment_method,
+        supporting both payment method and recipient OIB changes.
+        """
+        self._call_service(
+            self.client.service.promijeniPodatkeRacuna,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                Racun=invoice.to_ws_object(),
+            ),
+        )
+
+    def submit_tip(self, invoice: "InvoiceTip"):
+        self._call_service(
+            self.client.service.napojnice,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                Racun=invoice.to_ws_object(),
+            ),
+        )
+
+    def submit_working_hours(self, premises: "BusinessPremises"):
+        """
+        Register working hours for a single business premises (prijaviRadnoVrijeme)
+        """
+        self._call_service(
+            self.client.service.prijaviRadnoVrijeme,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                PoslovniProstor=premises.to_ws_object(self),
+            ),
+        )
+
+    def delete_working_hours(self, premises: "BusinessPremises"):
+        """
+        Delete working hours for a business premises (brisiRadnoVrijeme)
+        """
+        self._call_service(
+            self.client.service.brisiRadnoVrijeme,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                PoslovniProstor=premises.to_delete_ws_object(self),
+            ),
+        )
+
+    def fetch_working_hours(
+        self,
+        oib: "OIB",
+        premises_code: str,
+        scope: "FetchScope",
+        operator_oib: "OIB",
+    ):
+        """
+        Fetch active working hours for a business premises (dohvatiRadnoVrijeme)
+        """
+        return self._call_service(
+            self.client.service.dohvatiRadnoVrijeme,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                Oib=oib,
+                OznPosPr=premises_code,
+                VrstaRadnogVremena=scope,
+                OibOper=operator_oib,
+            ),
+        )
+
+    def submit_working_hours_batch(
+        self,
+        oib: "OIB",
+        premises_list: "List[BusinessPremises]",
+        operator_oib: "OIB",
+    ):
+        """
+        Register working hours for multiple business premises
+        (prijaviRadnoVrijemeZaPoslovnice), up to 100.
+        """
+        poslovnice = self.type_factory.PoslovniProstoriListaType(
+            Poslovnica=[p.to_batch_ws_object(self) for p in premises_list]
+        )
+
+        return self._call_service(
+            self.client.service.prijaviRadnoVrijemeZaPoslovnice,
+            dict(
+                Zaglavlje=self.create_request_header(),
+                Oib=oib,
+                PoslovniProstori=poslovnice,
+                OibOper=operator_oib,
             ),
         )
 
