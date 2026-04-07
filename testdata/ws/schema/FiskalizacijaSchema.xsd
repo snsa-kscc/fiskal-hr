@@ -258,7 +258,7 @@
     <complexType>
       <sequence>
         <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
-        <element name="Racun" type="tns:RacunPPRType" minOccurs="1" maxOccurs="1" />
+        <element name="Racun" type="tns:RacunPPType" minOccurs="1" maxOccurs="1" />
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
       <attribute name="Id" type="string" >
@@ -1281,7 +1281,7 @@
     </sequence>
   </complexType>
 
-  <complexType name="RacunPPRType">
+  <complexType name="RacunPPType">
     <annotation>
       <documentation>
         Tip podataka za promjenu podataka racuna (nacin placanja i/ili OIB primatelja racuna).
@@ -1454,15 +1454,34 @@
           </documentation>
         </annotation>
       </element>
-      <element name="PromijenjeniOibPrimateljaRacuna" type="tns:OibType" minOccurs="1" maxOccurs="1">
+      <element name="PromijenjeniOibPrimateljaRacuna" type="tns:OibPromjenaType" minOccurs="1" maxOccurs="1">
         <annotation>
           <documentation>
-            Promijenjeni OIB primatelja racuna. Treba slati prazan element ili nonblank space ako se ne salje OIB u promjeni.
+            Obavezan element. Ako se zeli pobrisati OibPrimateljaRacuna salje se prazan element, inace se salje zadnji OibPrimateljaRacuna.
           </documentation>
         </annotation>
       </element>
     </sequence>
   </complexType>
+
+  <simpleType name="OibPromjenaType">
+    <annotation>
+      <documentation>Definira element koji u sebi sadrzava oib ili non blank space.</documentation>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="string">
+          <length value="11" />
+          <pattern value="\d*" />
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="string">
+          <length value="0" />
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
 
   <simpleType name="OznakaSlijednostiType">
     <annotation>

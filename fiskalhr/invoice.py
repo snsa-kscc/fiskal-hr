@@ -767,7 +767,7 @@ class InvoiceDataChange(Invoice):
         self._new_recipient_oib = None
 
     def get_ws_object_type(self) -> Any:
-        return self.client.type_factory.RacunPPRType
+        return self.client.type_factory.RacunPPType
 
     def to_ws_object(self) -> Any:
         if not self.original_zki:
@@ -790,7 +790,7 @@ class InvoiceDataChange(Invoice):
         obj = super().to_ws_object(original_zki=self.original_zki)
         obj.PromijenjeniNacinPlac = self.new_payment_method
         obj.PromijenjeniOibPrimateljaRacuna = (
-            self.new_recipient_oib if self.new_recipient_oib else " "
+            self.new_recipient_oib if self.new_recipient_oib else ""
         )
         return obj
 

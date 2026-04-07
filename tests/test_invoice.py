@@ -677,7 +677,7 @@ def test_data_change_to_ws_object():
 
     obj = inv.to_ws_object()
     assert obj.PromijenjeniNacinPlac == PaymentMethod.CARD
-    assert obj.PromijenjeniOibPrimateljaRacuna == " "
+    assert obj.PromijenjeniOibPrimateljaRacuna == ""
 
 
 def test_data_change_with_new_oib():
@@ -697,10 +697,10 @@ def test_data_change_with_new_oib():
     assert obj.PromijenjeniOibPrimateljaRacuna == OIB("12345678903")
 
 
-def test_data_change_uses_ppr_type():
+def test_data_change_uses_pp_type():
     fc = Mock()
     inv = InvoiceDataChange(fc)
-    assert inv.get_ws_object_type() == fc.type_factory.RacunPPRType
+    assert inv.get_ws_object_type() == fc.type_factory.RacunPPType
 
 
 def test_document():
