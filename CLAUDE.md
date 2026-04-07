@@ -46,9 +46,9 @@ This is a Python library for Croatian [Fiskalizacija](https://www.porezna-uprava
 
 ### Key modules
 
-- **`ws.py`** — `FiskalClient`: the main entry point. Wraps a `zeep` SOAP client. The WSDL and service cert/CA paths are passed at construction time. Provides `test_service()`, `check_invoice()`, `submit_invoice()`, `change_payment_method()`, `change_invoice_data()`, `submit_tip()`, `submit_document()`, `submit_working_hours()`, `delete_working_hours()`, `fetch_working_hours()`, `submit_working_hours_batch()`.
+- **`ws.py`** — `FiskalClient`: the main entry point. Wraps a `zeep` SOAP client. The WSDL and service cert/CA paths are passed at construction time. Provides `test_service()`, `check_invoice()`, `submit_invoice()`, `change_payment_method()`, `change_invoice_data()`, `submit_tip()`, `submit_working_hours()`, `delete_working_hours()`, `fetch_working_hours()`, `submit_working_hours_batch()`.
 
-- **`invoice.py`** — `Invoice`, `Document`, `InvoiceWithDoc`, `InvoicePaymentMethodChange`, `InvoiceDataChange`, `InvoiceTip`, `BaseDocument`: property-based models. Setting attributes (e.g. `invoice.vat`, `invoice.fees`) validates and stores data. `Invoice` auto-calculates `ZKI` (the local control code) from `zki.py` whenever relevant properties change. `Invoice` supports optional `recipient_oib` for B2B cash/card transactions. `InvoiceDataChange` supports changing both payment method and recipient OIB on a fiscalized invoice (spec section 2.1.6). `InvoiceTip` supports submitting tips for fiscalized invoices.
+- **`invoice.py`** — `Invoice`, `InvoicePaymentMethodChange`, `InvoiceDataChange`, `InvoiceTip`, `BaseDocument`: property-based models. Setting attributes (e.g. `invoice.vat`, `invoice.fees`) validates and stores data. `Invoice` auto-calculates `ZKI` (the local control code) from `zki.py` whenever relevant properties change. `Invoice` supports optional `recipient_oib` for B2B cash/card transactions. `InvoiceDataChange` supports changing both payment method and recipient OIB on a fiscalized invoice (spec section 2.1.6). `InvoiceTip` supports submitting tips for fiscalized invoices.
 
 - **`premises.py`** — `BusinessPremises`, `SingleShiftHours`, `WorkingHoursRange`, `SeasonalHours`: models for business premises working hours registration. Supports single shifts, ranges (Mon-Fri), seasonal hours, and even/odd week schedules.
 

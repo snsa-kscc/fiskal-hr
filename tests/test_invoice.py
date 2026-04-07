@@ -8,13 +8,11 @@ from freezegun import freeze_time
 
 from fiskalhr.enums import PaymentMethod, SequenceScope
 from fiskalhr.invoice import (
-    Document,
     Invoice,
     InvoiceDataChange,
     InvoiceNumber,
     InvoicePaymentMethodChange,
     InvoiceTip,
-    InvoiceWithDoc,
 )
 from fiskalhr.item import Fee, TaxItem
 from fiskalhr.oib import OIB
@@ -454,64 +452,6 @@ def test_get_qr_link_using_jir():
     assert "zki" not in params
 
 
-def test_empty_pd_invoice():
-    fc = Mock()
-    inv = InvoiceWithDoc(fc)
-
-    assert inv.document_jir is None
-    assert inv.document_zki is None
-
-
-def test_pd_invoice_with_document_data():
-    fc = Mock()
-    inv = InvoiceWithDoc(
-        fc,
-        document_jir="0000" * 8,
-        document_zki="abcd" * 8,
-    )
-
-    assert inv.document_jir == "0000" * 8
-    assert inv.document_zki == ZKI("abcd" * 8)
-
-
-def test_pd_invoice_missing_doc_data_to_ws_object_fails():
-    fc = Mock()
-    fc.signer.sign_zki_payload.return_value = "abcd" * 8
-
-    inv = InvoiceWithDoc(fc, **TEST_INVOICE_PARAMS)
-
-    with pytest.raises(ValueError):
-        inv.to_ws_object()
-
-
-def test_pd_invoice_with_doc_zki_to_ws_object():
-    fc = Mock()
-    fc.signer.sign_zki_payload.return_value = "abcd" * 8
-
-    inv = InvoiceWithDoc(
-        fc,
-        document_zki=ZKI("abcd" * 8),
-        **TEST_INVOICE_PARAMS,
-    )
-
-    obj = inv.to_ws_object()
-    assert obj.PrateciDokument["_value_1"][0]["ZastKodPD"] == ZKI("abcd" * 8)
-
-
-def test_pd_invoice_with_doc_jir_to_ws_object():
-    fc = Mock()
-    fc.signer.sign_zki_payload.return_value = "abcd" * 8
-
-    inv = InvoiceWithDoc(
-        fc,
-        document_jir="0000" * 8,
-        **TEST_INVOICE_PARAMS,
-    )
-
-    obj = inv.to_ws_object()
-    assert obj.PrateciDokument["_value_1"][0]["JirPD"] == "0000" * 8
-
-
 def test_empty_payment_change():
     fc = Mock()
     inv = InvoicePaymentMethodChange(fc)
@@ -701,15 +641,6 @@ def test_data_change_uses_pp_type():
     fc = Mock()
     inv = InvoiceDataChange(fc)
     assert inv.get_ws_object_type() == fc.type_factory.RacunPPType
-
-
-def test_document():
-    fc = Mock()
-    fc.signer.sign_zki_payload.return_value = "abcd" * 8
-
-    inv = Document(fc, **TEST_INVOICE_PARAMS)
-
-    inv.to_ws_object()
 
 
 def test_invoice_to_dict():

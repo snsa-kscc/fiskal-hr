@@ -5,7 +5,7 @@ from zeep.exceptions import Fault
 
 from fiskalhr.enums import FetchScope, ResponseErrorEnum
 from fiskalhr.errors import ResponseError
-from fiskalhr.invoice import Invoice, InvoiceTip, InvoiceWithDoc
+from fiskalhr.invoice import Invoice, InvoiceTip
 from fiskalhr.oib import OIB
 from fiskalhr.ws import FiskalClient
 
@@ -18,7 +18,7 @@ SERVICE_FAULT_XML = """<?xml version="1.0" encoding="UTF-8"?>
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 >
     <soap:Body>
-        <tns:ProvjeraOdgovor
+        <tns:RacunOdgovor
             Id="G0x7f17105098f8-4D"
             xsi:schemaLocation="http://www.apis-it.hr/fin/2012/types/f73
             ../schema/FiskalizacijaSchema.xsd "
@@ -37,7 +37,7 @@ SERVICE_FAULT_XML = """<?xml version="1.0" encoding="UTF-8"?>
                     </tns:PorukaGreske>
                 </tns:Greska>
             </tns:Greske>
-        </tns:ProvjeraOdgovor>
+        </tns:RacunOdgovor>
     </soap:Body>
 </soap:Envelope>
 """
@@ -83,11 +83,9 @@ class TestFiskalClient:
             "echo",
             "racuni",
             "provjera",
-            "racuniPD",
-            "prateciDokumenti",
             "promijeniNacPlac",
             "promijeniPodatkeRacuna",
-            "napojnice",
+            "napojnica",
             "prijaviRadnoVrijeme",
             "obrisiRadnoVrijeme",
             "dohvatiRadnoVrijeme",
@@ -183,40 +181,12 @@ class TestFiskalClient:
         assert srv.call_args.kwargs["Racun"] == invoice.to_ws_object.return_value
         assert resp == srv.return_value.Racun
 
-    def test_check_invoice_with_doc(self):
-        self.fc.client = Mock()
-        srv = Mock()
-        self.fc.client.service.provjera = srv
-        invoice = Mock()
-        invoice.__class__ = InvoiceWithDoc
-
-        resp = self.fc.check_invoice(invoice)
-
-        invoice.to_ws_object.assert_called_once()
-        srv.assert_called_once()
-        assert srv.call_args.kwargs["RacunPD"] == invoice.to_ws_object.return_value
-        assert resp == srv.return_value.RacunPD
-
     def test_submit_invoice(self):
         self.fc.client = Mock()
         srv = Mock()
         self.fc.client.service.racuni = srv
         invoice = Mock()
         invoice.__class__ = Invoice
-
-        resp = self.fc.submit_invoice(invoice)
-
-        invoice.to_ws_object.assert_called_once()
-        srv.assert_called_once()
-        assert srv.call_args.kwargs["Racun"] == invoice.to_ws_object.return_value
-        assert resp == srv.return_value.Jir
-
-    def test_submit_invoice_with_doc(self):
-        self.fc.client = Mock()
-        srv = Mock()
-        self.fc.client.service.racuniPD = srv
-        invoice = Mock()
-        invoice.__class__ = InvoiceWithDoc
 
         resp = self.fc.submit_invoice(invoice)
 
@@ -252,7 +222,7 @@ class TestFiskalClient:
     def test_submit_tip(self):
         self.fc.client = Mock()
         srv = Mock()
-        self.fc.client.service.napojnice = srv
+        self.fc.client.service.napojnica = srv
         invoice = Mock()
         invoice.__class__ = InvoiceTip
 
@@ -261,19 +231,6 @@ class TestFiskalClient:
         invoice.to_ws_object.assert_called_once()
         srv.assert_called_once()
         assert srv.call_args.kwargs["Racun"] == invoice.to_ws_object.return_value
-
-    def test_submit_document(self):
-        self.fc.client = Mock()
-        srv = Mock()
-        self.fc.client.service.prateciDokumenti = srv
-        doc = Mock()
-
-        resp = self.fc.submit_document(doc)
-
-        doc.to_ws_object.assert_called_once()
-        srv.assert_called_once()
-        assert srv.call_args.kwargs["PrateciDokument"] == doc.to_ws_object.return_value
-        assert resp == srv.return_value.Jir
 
     def test_submit_working_hours(self):
         self.fc.client = Mock()

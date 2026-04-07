@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
     from .enums import FetchScope
     from .invoice import (
-        Document,
         Invoice,
         InvoiceDataChange,
         InvoicePaymentMethodChange,
@@ -147,37 +146,24 @@ class FiskalClient:
             raise ResponseError.from_fault_response(fault_response)
 
     def check_invoice(self, invoice: "Invoice"):
-        from .invoice import InvoiceWithDoc
-
         if not hasattr(self.client.service, "provjera"):
             raise RuntimeError("Check invoice operation is only available in demo mode")
 
         body = invoice.to_ws_object()
-        request_kwargs = dict(Zaglavlje=self.create_request_header())
-
-        if isinstance(invoice, InvoiceWithDoc):
-            request_kwargs["RacunPD"] = body
-        else:
-            request_kwargs["Racun"] = body
+        request_kwargs = dict(
+            Zaglavlje=self.create_request_header(),
+            Racun=body,
+        )
 
         response = self._call_service(self.client.service.provjera, request_kwargs)
 
-        return (
-            response.RacunPD if isinstance(invoice, InvoiceWithDoc) else response.Racun
-        )
+        return response.Racun
 
     def submit_invoice(self, invoice: "Invoice") -> str:
-        from .invoice import InvoiceWithDoc
-
         body = invoice.to_ws_object()
         request_kwargs = dict(Zaglavlje=self.create_request_header(), Racun=body)
 
-        if isinstance(invoice, InvoiceWithDoc):
-            service_proxy = self.client.service.racuniPD
-        else:
-            service_proxy = self.client.service.racuni
-
-        response = self._call_service(service_proxy, request_kwargs)
+        response = self._call_service(self.client.service.racuni, request_kwargs)
         return response.Jir
 
     def change_payment_method(self, invoice: "InvoicePaymentMethodChange"):
@@ -207,7 +193,7 @@ class FiskalClient:
 
     def submit_tip(self, invoice: "InvoiceTip"):
         self._call_service(
-            self.client.service.napojnice,
+            self.client.service.napojnica,
             dict(
                 Zaglavlje=self.create_request_header(),
                 Racun=invoice.to_ws_object(),
@@ -285,13 +271,3 @@ class FiskalClient:
             ),
         )
 
-    def submit_document(self, doc: "Document") -> str:
-        response = self._call_service(
-            self.client.service.prateciDokumenti,
-            dict(
-                Zaglavlje=self.create_request_header(),
-                PrateciDokument=doc.to_ws_object(),
-            ),
-        )
-
-        return response.Jir
