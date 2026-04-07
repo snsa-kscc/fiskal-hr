@@ -1844,189 +1844,176 @@
     </restriction>
   </simpleType>
 
-  <simpleType name="String5Type">
+  <simpleType name="VrijemeType">
     <restriction base="string">
-      <minLength value="1" />
-      <maxLength value="5" />
+      <pattern value="([01][0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]|24:00)"/>
     </restriction>
   </simpleType>
 
   <simpleType name="DanUTjednuType">
     <restriction base="string">
-      <pattern value="[1-8]" />
+      <enumeration value="1"/>
+      <enumeration value="2"/>
+      <enumeration value="3"/>
+      <enumeration value="4"/>
+      <enumeration value="5"/>
+      <enumeration value="6"/>
+      <enumeration value="7"/>
+      <enumeration value="8"/>
     </restriction>
   </simpleType>
 
   <simpleType name="DioDvokratnogType">
     <restriction base="string">
-      <pattern value="[12]" />
+      <enumeration value="1"/>
+      <enumeration value="2"/>
     </restriction>
   </simpleType>
 
-  <simpleType name="ParniNeparniType">
+  <simpleType name="ParNeparType">
     <restriction base="string">
-      <enumeration value="P" />
-      <enumeration value="N" />
+      <enumeration value="P"/>
+      <enumeration value="N"/>
     </restriction>
   </simpleType>
 
-  <simpleType name="VrstaRadnogVremenaType">
-    <restriction base="string">
-      <enumeration value="REDOVNO" />
-      <enumeration value="IZNIMKE" />
-      <enumeration value="SVE" />
-    </restriction>
-  </simpleType>
-
-  <complexType name="JednokratnoRVType">
+  <complexType name="JednokratnoType">
     <sequence>
       <element name="DanUTjednu" type="tns:DanUTjednuType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
-  <complexType name="DvokratnoRVType">
+  <complexType name="DvokratnoType">
     <sequence>
       <element name="DanUTjednu" type="tns:DanUTjednuType" minOccurs="1" maxOccurs="1" />
       <element name="DioDvokratnog" type="tns:DioDvokratnogType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
-  <complexType name="ParniNeparniRVType">
+  <complexType name="ParniNeparniType">
     <sequence>
       <element name="DanUTjednu" type="tns:DanUTjednuType" minOccurs="1" maxOccurs="1" />
-      <element name="ParniNeparniDani" type="tns:ParniNeparniType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="ParNepar" type="tns:ParNeparType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
-  <complexType name="PoDogovoruRVType">
+  <complexType name="PoDogovoruType">
     <sequence>
-      <element name="RedovnoPoDogovoru" type="string" minOccurs="1" maxOccurs="1" />
+      <element name="RedovnoPoDogovoru" type="string" fixed="DA" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
-  <complexType name="RedovnoRadnoVrijemeType">
+  <complexType name="RedovnoType">
     <sequence>
       <element name="DatumOd" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+      <element name="DatumDo" type="tns:DatumType" minOccurs="0" maxOccurs="1" />
       <element name="Napomena" type="tns:String200Type" minOccurs="0" maxOccurs="1" />
       <choice>
-        <element name="PoDogovoru" type="tns:PoDogovoruRVType" minOccurs="1" maxOccurs="1" />
-        <element name="Jednokratno" type="tns:JednokratnoRVType" minOccurs="1" maxOccurs="unbounded" />
-        <element name="Dvokratno" type="tns:DvokratnoRVType" minOccurs="1" maxOccurs="unbounded" />
-        <element name="ParniNeparni" type="tns:ParniNeparniRVType" minOccurs="1" maxOccurs="unbounded" />
+        <element name="PoDogovoru" type="tns:PoDogovoruType" minOccurs="1" maxOccurs="1" />
+        <element name="Jednokratno" type="tns:JednokratnoType" minOccurs="1" maxOccurs="8" />
+        <element name="Dvokratno" type="tns:DvokratnoType" minOccurs="1" maxOccurs="16" />
+        <element name="ParniNeparni" type="tns:ParniNeparniType" minOccurs="1" maxOccurs="16" />
       </choice>
     </sequence>
   </complexType>
 
-  <complexType name="JednokratnoIznimkaType">
+  <complexType name="JednokratnoIznimkeType">
     <sequence>
-      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
-  <complexType name="DvokratnoIznimkaType">
+  <complexType name="DvokratnoIznimkeType">
     <sequence>
       <element name="DioDvokratnog" type="tns:DioDvokratnogType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeOd" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijemeDo" type="tns:String5Type" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeOd" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
+      <element name="RadnoVrijemeDo" type="tns:VrijemeType" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
-  <complexType name="IznimkaRadnogVremenaType">
+  <complexType name="IznimkeType">
     <sequence>
       <element name="Datum" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
       <choice>
-        <element name="Jednokratno" type="tns:JednokratnoIznimkaType" minOccurs="1" maxOccurs="1" />
-        <element name="Dvokratno" type="tns:DvokratnoIznimkaType" minOccurs="1" maxOccurs="unbounded" />
+        <element name="Jednokratno" type="tns:JednokratnoIznimkeType" minOccurs="1" maxOccurs="1" />
+        <element name="Dvokratno" type="tns:DvokratnoIznimkeType" minOccurs="2" maxOccurs="2" />
       </choice>
     </sequence>
   </complexType>
 
   <complexType name="RadnoVrijemeType">
     <sequence>
-      <element name="Redovno" type="tns:RedovnoRadnoVrijemeType" minOccurs="0" maxOccurs="3" />
-      <element name="Iznimke" type="tns:IznimkaRadnogVremenaType" minOccurs="0" maxOccurs="10" />
+      <element name="Redovno" type="tns:RedovnoType" minOccurs="0" maxOccurs="3" />
+      <element name="Iznimke" type="tns:IznimkeType" minOccurs="0" maxOccurs="10" />
     </sequence>
   </complexType>
 
-  <complexType name="PoslovniProstorRVType">
+  <complexType name="PoslovniProstorType">
     <sequence>
       <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
       <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="1" maxOccurs="1" />
-      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+      <choice>
+        <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="1" maxOccurs="1" />
+        <element name="BrisanjeRadnogVremena" type="tns:RadnoVrijemeBrisanjeType" minOccurs="1" maxOccurs="1" />
+      </choice>
     </sequence>
   </complexType>
 
-  <complexType name="BrisanjeRedovnogType">
+  <complexType name="RadnoVrijemeBrisanjeType">
     <sequence>
-      <element name="DatumOd" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+      <element name="Redovno" minOccurs="0" maxOccurs="3">
+        <complexType>
+          <sequence>
+            <element name="DatumOd" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+          </sequence>
+        </complexType>
+      </element>
+      <element name="Iznimke" minOccurs="0" maxOccurs="10">
+        <complexType>
+          <sequence>
+            <element name="Datum" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
+          </sequence>
+        </complexType>
+      </element>
     </sequence>
   </complexType>
 
-  <complexType name="BrisanjeIznimkeType">
-    <sequence>
-      <element name="Datum" type="tns:DatumType" minOccurs="1" maxOccurs="1" />
-    </sequence>
-  </complexType>
-
-  <complexType name="BrisanjeRadnogVremenaType">
-    <sequence>
-      <element name="Redovno" type="tns:BrisanjeRedovnogType" minOccurs="0" maxOccurs="3" />
-      <element name="Iznimke" type="tns:BrisanjeIznimkeType" minOccurs="0" maxOccurs="10" />
-    </sequence>
-  </complexType>
-
-  <complexType name="PoslovniProstorBrisanjeRVType">
-    <sequence>
-      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
-      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
-      <element name="BrisanjeRadnogVremena" type="tns:BrisanjeRadnogVremenaType" minOccurs="1" maxOccurs="1" />
-      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
-    </sequence>
-  </complexType>
-
-  <complexType name="PoslovnicaRVType">
+  <complexType name="PoslovnicaType">
     <sequence>
       <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="0" maxOccurs="1" />
-      <element name="Redovno" type="tns:RedovnoRadnoVrijemeType" minOccurs="0" maxOccurs="1" />
-      <element name="Iznimke" type="tns:IznimkaRadnogVremenaType" minOccurs="0" maxOccurs="1" />
+      <choice>
+        <element name="Iznimka" type="tns:IznimkeType" minOccurs="1" maxOccurs="1" />
+        <element name="Redovno" type="tns:RedovnoType" minOccurs="1" maxOccurs="1" />
+      </choice>
     </sequence>
   </complexType>
 
-  <complexType name="PoslovniProstoriListaType">
+  <complexType name="PoslovniProstoriType">
     <sequence>
-      <element name="Poslovnica" type="tns:PoslovnicaRVType" minOccurs="1" maxOccurs="100" />
+      <element name="Poslovnica" type="tns:PoslovnicaType" minOccurs="1" maxOccurs="100" />
     </sequence>
   </complexType>
 
   <complexType name="PoslovnicaOdgovorType">
     <sequence>
       <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
-      <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="0" maxOccurs="1" />
-      <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+      <choice>
+        <element name="PorukaOdgovora" type="tns:PorukaOdgovoraType" minOccurs="1" maxOccurs="1" />
+        <element name="Greske" type="tns:GreskeType" minOccurs="1" maxOccurs="1" />
+      </choice>
     </sequence>
   </complexType>
 
-  <complexType name="PoslovniProstoriOdgovorListaType">
+  <complexType name="PoslovniProstoriOdgovorType">
     <sequence>
-      <element name="Poslovnica" type="tns:PoslovnicaOdgovorType" minOccurs="1" maxOccurs="100" />
-    </sequence>
-  </complexType>
-
-  <complexType name="DohvatRadnoVrijemeOdgovorType">
-    <sequence>
-      <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
-      <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
-      <element name="RadnoVrijeme" type="tns:RadnoVrijemeType" minOccurs="0" maxOccurs="1" />
-      <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
+      <element name="PoslovnicaOdgovor" type="tns:PoslovnicaOdgovorType" minOccurs="1" maxOccurs="unbounded" />
     </sequence>
   </complexType>
 
@@ -2035,7 +2022,8 @@
     <complexType>
       <sequence>
         <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
-        <element name="PoslovniProstor" type="tns:PoslovniProstorRVType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstor" type="tns:PoslovniProstorType" minOccurs="1" maxOccurs="1" />
+        <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
       <attribute name="Id" type="string" />
@@ -2059,7 +2047,8 @@
     <complexType>
       <sequence>
         <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
-        <element name="PoslovniProstor" type="tns:PoslovniProstorBrisanjeRVType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstor" type="tns:PoslovniProstorType" minOccurs="1" maxOccurs="1" />
+        <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
       <attribute name="Id" type="string" />
@@ -2085,7 +2074,15 @@
         <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
         <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
         <element name="OznPosPr" type="tns:OznPoslProstoraType" minOccurs="1" maxOccurs="1" />
-        <element name="VrstaRadnogVremena" type="tns:VrstaRadnogVremenaType" minOccurs="1" maxOccurs="1" />
+        <element name="VrstaRadnogVremena" minOccurs="1" maxOccurs="1">
+          <simpleType>
+            <restriction base="string">
+              <enumeration value="REDOVNO"/>
+              <enumeration value="IZNIMKE"/>
+              <enumeration value="SVE"/>
+            </restriction>
+          </simpleType>
+        </element>
         <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
@@ -2097,7 +2094,7 @@
     <complexType>
       <sequence>
         <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
-        <element name="PoslovniProstor" type="tns:DohvatRadnoVrijemeOdgovorType" minOccurs="0" maxOccurs="1" />
+        <element name="PoslovniProstor" type="tns:PoslovniProstorType" minOccurs="0" maxOccurs="1" />
         <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
@@ -2111,7 +2108,7 @@
       <sequence>
         <element name="Zaglavlje" type="tns:ZaglavljeType" minOccurs="1" maxOccurs="1" />
         <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
-        <element name="PoslovniProstori" type="tns:PoslovniProstoriListaType" minOccurs="1" maxOccurs="1" />
+        <element name="PoslovniProstori" type="tns:PoslovniProstoriType" minOccurs="1" maxOccurs="1" />
         <element name="OibOper" type="tns:OibType" minOccurs="1" maxOccurs="1" />
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
@@ -2123,9 +2120,10 @@
     <complexType>
       <sequence>
         <element name="Zaglavlje" type="tns:ZaglavljeOdgovorType" minOccurs="1" maxOccurs="1" />
-        <element name="Oib" type="tns:OibType" minOccurs="1" maxOccurs="1" />
-        <element name="PoslovniProstori" type="tns:PoslovniProstoriOdgovorListaType" minOccurs="0" maxOccurs="1" />
-        <element name="Greske" type="tns:GreskeType" minOccurs="0" maxOccurs="1" />
+        <choice>
+          <element name="PoslovniProstoriOdgovor" type="tns:PoslovniProstoriOdgovorType" minOccurs="1" maxOccurs="1" />
+          <element name="Greske" type="tns:GreskeType" minOccurs="1" maxOccurs="1" />
+        </choice>
         <element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
       </sequence>
       <attribute name="Id" type="string" />

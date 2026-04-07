@@ -223,18 +223,20 @@ class FiskalClient:
             dict(
                 Zaglavlje=self.create_request_header(),
                 PoslovniProstor=premises.to_ws_object(self),
+                OibOper=premises.operator_oib,
             ),
         )
 
     def delete_working_hours(self, premises: "BusinessPremises"):
         """
-        Delete working hours for a business premises (brisiRadnoVrijeme)
+        Delete working hours for a business premises (obrisiRadnoVrijeme)
         """
         self._call_service(
-            self.client.service.brisiRadnoVrijeme,
+            self.client.service.obrisiRadnoVrijeme,
             dict(
                 Zaglavlje=self.create_request_header(),
                 PoslovniProstor=premises.to_delete_ws_object(self),
+                OibOper=premises.operator_oib,
             ),
         )
 
@@ -269,7 +271,7 @@ class FiskalClient:
         Register working hours for multiple business premises
         (prijaviRadnoVrijemeZaPoslovnice), up to 100.
         """
-        poslovnice = self.type_factory.PoslovniProstoriListaType(
+        poslovnice = self.type_factory.PoslovniProstoriType(
             Poslovnica=[p.to_batch_ws_object(self) for p in premises_list]
         )
 

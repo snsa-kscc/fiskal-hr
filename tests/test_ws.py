@@ -89,7 +89,7 @@ class TestFiskalClient:
             "promijeniPodatkeRacuna",
             "napojnice",
             "prijaviRadnoVrijeme",
-            "brisiRadnoVrijeme",
+            "obrisiRadnoVrijeme",
             "dohvatiRadnoVrijeme",
             "prijaviRadnoVrijemeZaPoslovnice",
         }
@@ -289,11 +289,12 @@ class TestFiskalClient:
             srv.call_args.kwargs["PoslovniProstor"]
             == premises.to_ws_object.return_value
         )
+        assert srv.call_args.kwargs["OibOper"] == premises.operator_oib
 
     def test_delete_working_hours(self):
         self.fc.client = Mock()
         srv = Mock()
-        self.fc.client.service.brisiRadnoVrijeme = srv
+        self.fc.client.service.obrisiRadnoVrijeme = srv
         premises = Mock()
 
         self.fc.delete_working_hours(premises)
@@ -304,6 +305,7 @@ class TestFiskalClient:
             srv.call_args.kwargs["PoslovniProstor"]
             == premises.to_delete_ws_object.return_value
         )
+        assert srv.call_args.kwargs["OibOper"] == premises.operator_oib
 
     def test_fetch_working_hours(self):
         self.fc.client = Mock()

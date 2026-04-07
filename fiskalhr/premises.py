@@ -22,7 +22,7 @@ class SingleShiftHours:
         self.time_to = time_to
 
     def to_ws_object(self, type_factory: Any) -> Any:
-        return type_factory.JednokratnoRVType(
+        return type_factory.JednokratnoType(
             DanUTjednu=self.day,
             RadnoVrijemeOd=self.time_from,
             RadnoVrijemeDo=self.time_to,
@@ -46,7 +46,7 @@ class DoubleShiftHours:
         self.time_to = time_to
 
     def to_ws_object(self, type_factory: Any) -> Any:
-        return type_factory.DvokratnoRVType(
+        return type_factory.DvokratnoType(
             DanUTjednu=self.day,
             DioDvokratnog=str(self.shift_part),
             RadnoVrijemeOd=self.time_from,
@@ -68,9 +68,9 @@ class EvenOddHours:
         self.time_to = time_to
 
     def to_ws_object(self, type_factory: Any) -> Any:
-        return type_factory.ParniNeparniRVType(
+        return type_factory.ParniNeparniType(
             DanUTjednu=self.day,
-            ParniNeparniDani=self.even_odd,
+            ParNepar=self.even_odd,
             RadnoVrijemeOd=self.time_from,
             RadnoVrijemeDo=self.time_to,
         )
@@ -110,7 +110,7 @@ class RegularWorkingHours:
             kwargs["Napomena"] = self.note
 
         if self.by_arrangement:
-            kwargs["PoDogovoru"] = type_factory.PoDogovoruRVType(RedovnoPoDogovoru="DA")
+            kwargs["PoDogovoru"] = type_factory.PoDogovoruType(RedovnoPoDogovoru="DA")
         elif self.single_shifts:
             kwargs["Jednokratno"] = [
                 s.to_ws_object(type_factory) for s in self.single_shifts
@@ -124,7 +124,7 @@ class RegularWorkingHours:
                 s.to_ws_object(type_factory) for s in self.even_odd_shifts
             ]
 
-        return type_factory.RedovnoRadnoVrijemeType(**kwargs)
+        return type_factory.RedovnoType(**kwargs)
 
 
 class ExceptionSingleShift:
@@ -139,7 +139,7 @@ class ExceptionSingleShift:
         self.time_to = time_to
 
     def to_ws_object(self, type_factory: Any) -> Any:
-        return type_factory.JednokratnoIznimkaType(
+        return type_factory.JednokratnoIznimkeType(
             RadnoVrijemeOd=self.time_from,
             RadnoVrijemeDo=self.time_to,
         )
@@ -160,7 +160,7 @@ class ExceptionDoubleShift:
         self.time_to = time_to
 
     def to_ws_object(self, type_factory: Any) -> Any:
-        return type_factory.DvokratnoIznimkaType(
+        return type_factory.DvokratnoIznimkeType(
             DioDvokratnog=str(self.shift_part),
             RadnoVrijemeOd=self.time_from,
             RadnoVrijemeDo=self.time_to,
@@ -197,7 +197,7 @@ class WorkingHoursException:
                 s.to_ws_object(type_factory) for s in self.double_shifts
             ]
 
-        return type_factory.IznimkaRadnogVremenaType(**kwargs)
+        return type_factory.IznimkeType(**kwargs)
 
 
 class BusinessPremises:
@@ -235,7 +235,7 @@ class BusinessPremises:
         self._premises_code = value
 
     def to_ws_object(self, client: "FiskalClient") -> Any:
-        """Build SOAP object for registering working hours"""
+        """Build PoslovniProstorType SOAP object for registering working hours"""
         tf = client.type_factory
 
         rv = tf.RadnoVrijemeType(
@@ -243,49 +243,54 @@ class BusinessPremises:
             Iznimke=[e.to_ws_object(tf) for e in self.exceptions],
         )
 
-        return tf.PoslovniProstorRVType(
+        return tf.PoslovniProstorType(
             Oib=self.oib,
             OznPosPr=self.premises_code,
             RadnoVrijeme=rv,
-            OibOper=self.operator_oib,
         )
 
     def to_delete_ws_object(self, client: "FiskalClient") -> Any:
-        """Build SOAP object for deleting working hours"""
+        """Build PoslovniProstorType SOAP object for deleting working hours"""
         tf = client.type_factory
 
         redovno = [
-            tf.BrisanjeRedovnogType(DatumOd=r.date_from.strftime("%d.%m.%Y"))
-            for r in self.regular_hours
+            {"DatumOd": r.date_from.strftime("%d.%m.%Y")} for r in self.regular_hours
         ]
 
         iznimke = [
-            tf.BrisanjeIznimkeType(Datum=e.exception_date.strftime("%d.%m.%Y"))
-            for e in self.exceptions
+            {"Datum": e.exception_date.strftime("%d.%m.%Y")} for e in self.exceptions
         ]
 
-        brisanje = tf.BrisanjeRadnogVremenaType(
+        brisanje = tf.RadnoVrijemeBrisanjeType(
             Redovno=redovno,
             Iznimke=iznimke,
         )
 
-        return tf.PoslovniProstorBrisanjeRVType(
+        return tf.PoslovniProstorType(
             Oib=self.oib,
             OznPosPr=self.premises_code,
             BrisanjeRadnogVremena=brisanje,
-            OibOper=self.operator_oib,
         )
 
     def to_batch_ws_object(self, client: "FiskalClient") -> Any:
-        """Build a single Poslovnica element for batch registration"""
+        """Build a single Poslovnica element for batch registration.
+
+        Each PoslovnicaType supports either one Redovno or one Iznimka
+        (not a full RadnoVrijemeType).
+        """
         tf = client.type_factory
 
-        rv = tf.RadnoVrijemeType(
-            Redovno=[r.to_ws_object(tf) for r in self.regular_hours],
-            Iznimke=[e.to_ws_object(tf) for e in self.exceptions],
-        )
-
-        return tf.PoslovnicaRVType(
-            OznPosPr=self.premises_code,
-            RadnoVrijeme=rv,
-        )
+        if self.regular_hours:
+            return tf.PoslovnicaType(
+                OznPosPr=self.premises_code,
+                Redovno=self.regular_hours[0].to_ws_object(tf),
+            )
+        elif self.exceptions:
+            return tf.PoslovnicaType(
+                OznPosPr=self.premises_code,
+                Iznimka=self.exceptions[0].to_ws_object(tf),
+            )
+        else:
+            raise ValueError(
+                "BusinessPremises must have regular_hours or exceptions for batch"
+            )

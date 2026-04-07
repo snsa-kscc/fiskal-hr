@@ -28,12 +28,12 @@ class TestSingleShiftHours:
         s = SingleShiftHours(DayOfWeek.FRIDAY, "09:00", "17:00")
         tf = Mock()
         result = s.to_ws_object(tf)
-        tf.JednokratnoRVType.assert_called_once_with(
+        tf.JednokratnoType.assert_called_once_with(
             DanUTjednu=DayOfWeek.FRIDAY,
             RadnoVrijemeOd="09:00",
             RadnoVrijemeDo="17:00",
         )
-        assert result == tf.JednokratnoRVType.return_value
+        assert result == tf.JednokratnoType.return_value
 
 
 class TestDoubleShiftHours:
@@ -52,13 +52,13 @@ class TestDoubleShiftHours:
         d = DoubleShiftHours(DayOfWeek.WEDNESDAY, 2, "16:00", "20:00")
         tf = Mock()
         result = d.to_ws_object(tf)
-        tf.DvokratnoRVType.assert_called_once_with(
+        tf.DvokratnoType.assert_called_once_with(
             DanUTjednu=DayOfWeek.WEDNESDAY,
             DioDvokratnog="2",
             RadnoVrijemeOd="16:00",
             RadnoVrijemeDo="20:00",
         )
-        assert result == tf.DvokratnoRVType.return_value
+        assert result == tf.DvokratnoType.return_value
 
 
 class TestEvenOddHours:
@@ -73,13 +73,13 @@ class TestEvenOddHours:
         e = EvenOddHours(DayOfWeek.HOLIDAY, EvenOdd.ODD, "08:00", "12:00")
         tf = Mock()
         result = e.to_ws_object(tf)
-        tf.ParniNeparniRVType.assert_called_once_with(
+        tf.ParniNeparniType.assert_called_once_with(
             DanUTjednu=DayOfWeek.HOLIDAY,
-            ParniNeparniDani=EvenOdd.ODD,
+            ParNepar=EvenOdd.ODD,
             RadnoVrijemeOd="08:00",
             RadnoVrijemeDo="12:00",
         )
-        assert result == tf.ParniNeparniRVType.return_value
+        assert result == tf.ParniNeparniType.return_value
 
 
 class TestRegularWorkingHours:
@@ -87,11 +87,11 @@ class TestRegularWorkingHours:
         r = RegularWorkingHours(date_from=date(2025, 6, 1), by_arrangement=True)
         tf = Mock()
         result = r.to_ws_object(tf)
-        tf.RedovnoRadnoVrijemeType.assert_called_once()
-        kwargs = tf.RedovnoRadnoVrijemeType.call_args.kwargs
+        tf.RedovnoType.assert_called_once()
+        kwargs = tf.RedovnoType.call_args.kwargs
         assert kwargs["DatumOd"] == "01.06.2025"
         assert "PoDogovoru" in kwargs
-        assert result == tf.RedovnoRadnoVrijemeType.return_value
+        assert result == tf.RedovnoType.return_value
 
     def test_with_note(self):
         r = RegularWorkingHours(
@@ -101,7 +101,7 @@ class TestRegularWorkingHours:
         )
         tf = Mock()
         r.to_ws_object(tf)
-        kwargs = tf.RedovnoRadnoVrijemeType.call_args.kwargs
+        kwargs = tf.RedovnoType.call_args.kwargs
         assert kwargs["Napomena"] == "Test note"
 
     def test_single_shifts(self):
@@ -112,7 +112,7 @@ class TestRegularWorkingHours:
         r = RegularWorkingHours(date_from=date(2025, 6, 1), single_shifts=shifts)
         tf = Mock()
         r.to_ws_object(tf)
-        kwargs = tf.RedovnoRadnoVrijemeType.call_args.kwargs
+        kwargs = tf.RedovnoType.call_args.kwargs
         assert "Jednokratno" in kwargs
         assert len(kwargs["Jednokratno"]) == 2
 
@@ -124,7 +124,7 @@ class TestRegularWorkingHours:
         r = RegularWorkingHours(date_from=date(2025, 6, 1), double_shifts=shifts)
         tf = Mock()
         r.to_ws_object(tf)
-        kwargs = tf.RedovnoRadnoVrijemeType.call_args.kwargs
+        kwargs = tf.RedovnoType.call_args.kwargs
         assert "Dvokratno" in kwargs
         assert len(kwargs["Dvokratno"]) == 2
 
@@ -135,7 +135,7 @@ class TestRegularWorkingHours:
         r = RegularWorkingHours(date_from=date(2025, 6, 1), even_odd_shifts=shifts)
         tf = Mock()
         r.to_ws_object(tf)
-        kwargs = tf.RedovnoRadnoVrijemeType.call_args.kwargs
+        kwargs = tf.RedovnoType.call_args.kwargs
         assert "ParniNeparni" in kwargs
         assert len(kwargs["ParniNeparni"]) == 1
 
@@ -150,11 +150,11 @@ class TestExceptionSingleShift:
         s = ExceptionSingleShift("10:00", "14:00")
         tf = Mock()
         result = s.to_ws_object(tf)
-        tf.JednokratnoIznimkaType.assert_called_once_with(
+        tf.JednokratnoIznimkeType.assert_called_once_with(
             RadnoVrijemeOd="10:00",
             RadnoVrijemeDo="14:00",
         )
-        assert result == tf.JednokratnoIznimkaType.return_value
+        assert result == tf.JednokratnoIznimkeType.return_value
 
 
 class TestExceptionDoubleShift:
@@ -172,12 +172,12 @@ class TestExceptionDoubleShift:
         d = ExceptionDoubleShift(2, "16:00", "20:00")
         tf = Mock()
         result = d.to_ws_object(tf)
-        tf.DvokratnoIznimkaType.assert_called_once_with(
+        tf.DvokratnoIznimkeType.assert_called_once_with(
             DioDvokratnog="2",
             RadnoVrijemeOd="16:00",
             RadnoVrijemeDo="20:00",
         )
-        assert result == tf.DvokratnoIznimkaType.return_value
+        assert result == tf.DvokratnoIznimkeType.return_value
 
 
 class TestWorkingHoursException:
@@ -196,11 +196,11 @@ class TestWorkingHoursException:
         )
         tf = Mock()
         result = exc.to_ws_object(tf)
-        tf.IznimkaRadnogVremenaType.assert_called_once()
-        kwargs = tf.IznimkaRadnogVremenaType.call_args.kwargs
+        tf.IznimkeType.assert_called_once()
+        kwargs = tf.IznimkeType.call_args.kwargs
         assert kwargs["Datum"] == "25.12.2025"
         assert "Jednokratno" in kwargs
-        assert result == tf.IznimkaRadnogVremenaType.return_value
+        assert result == tf.IznimkeType.return_value
 
     def test_to_ws_object_double(self):
         shifts = [
@@ -212,7 +212,7 @@ class TestWorkingHoursException:
         )
         tf = Mock()
         exc.to_ws_object(tf)
-        kwargs = tf.IznimkaRadnogVremenaType.call_args.kwargs
+        kwargs = tf.IznimkeType.call_args.kwargs
         assert "Dvokratno" in kwargs
         assert len(kwargs["Dvokratno"]) == 2
 
@@ -273,12 +273,12 @@ class TestBusinessPremises:
         result = bp.to_ws_object(client)
 
         tf.RadnoVrijemeType.assert_called_once()
-        tf.PoslovniProstorRVType.assert_called_once()
-        call_kwargs = tf.PoslovniProstorRVType.call_args.kwargs
+        tf.PoslovniProstorType.assert_called_once()
+        call_kwargs = tf.PoslovniProstorType.call_args.kwargs
         assert str(call_kwargs["Oib"]) == "12312312316"
         assert call_kwargs["OznPosPr"] == "POS01"
-        assert str(call_kwargs["OibOper"]) == "12312312316"
-        assert result == tf.PoslovniProstorRVType.return_value
+        assert "OibOper" not in call_kwargs
+        assert result == tf.PoslovniProstorType.return_value
 
     def test_to_delete_ws_object(self):
         regular = RegularWorkingHours(date_from=date(2025, 6, 1))
@@ -295,13 +295,17 @@ class TestBusinessPremises:
 
         result = bp.to_delete_ws_object(client)
 
-        tf.BrisanjeRedovnogType.assert_called_once_with(DatumOd="01.06.2025")
-        tf.BrisanjeIznimkeType.assert_called_once_with(Datum="25.12.2025")
-        tf.BrisanjeRadnogVremenaType.assert_called_once()
-        tf.PoslovniProstorBrisanjeRVType.assert_called_once()
-        assert result == tf.PoslovniProstorBrisanjeRVType.return_value
+        tf.RadnoVrijemeBrisanjeType.assert_called_once()
+        brisanje_kwargs = tf.RadnoVrijemeBrisanjeType.call_args.kwargs
+        assert brisanje_kwargs["Redovno"] == [{"DatumOd": "01.06.2025"}]
+        assert brisanje_kwargs["Iznimke"] == [{"Datum": "25.12.2025"}]
+        tf.PoslovniProstorType.assert_called_once()
+        call_kwargs = tf.PoslovniProstorType.call_args.kwargs
+        assert "OibOper" not in call_kwargs
+        assert "BrisanjeRadnogVremena" in call_kwargs
+        assert result == tf.PoslovniProstorType.return_value
 
-    def test_to_batch_ws_object(self):
+    def test_to_batch_ws_object_regular(self):
         regular = RegularWorkingHours(date_from=date(2025, 6, 1), by_arrangement=True)
         bp = BusinessPremises(
             oib="12312312316",
@@ -314,10 +318,43 @@ class TestBusinessPremises:
 
         result = bp.to_batch_ws_object(client)
 
-        tf.PoslovnicaRVType.assert_called_once()
-        call_kwargs = tf.PoslovnicaRVType.call_args.kwargs
+        tf.PoslovnicaType.assert_called_once()
+        call_kwargs = tf.PoslovnicaType.call_args.kwargs
         assert call_kwargs["OznPosPr"] == "POS02"
-        assert result == tf.PoslovnicaRVType.return_value
+        assert "Redovno" in call_kwargs
+        assert result == tf.PoslovnicaType.return_value
+
+    def test_to_batch_ws_object_exception(self):
+        exception = WorkingHoursException(
+            exception_date=date(2025, 12, 25),
+            single_shift=ExceptionSingleShift("10:00", "14:00"),
+        )
+        bp = BusinessPremises(
+            oib="12312312316",
+            premises_code="POS03",
+            operator_oib="12312312316",
+            exceptions=[exception],
+        )
+        client = Mock()
+        tf = client.type_factory
+
+        result = bp.to_batch_ws_object(client)
+
+        tf.PoslovnicaType.assert_called_once()
+        call_kwargs = tf.PoslovnicaType.call_args.kwargs
+        assert call_kwargs["OznPosPr"] == "POS03"
+        assert "Iznimka" in call_kwargs
+        assert result == tf.PoslovnicaType.return_value
+
+    def test_to_batch_ws_object_empty_raises(self):
+        bp = BusinessPremises(
+            oib="12312312316",
+            premises_code="POS04",
+            operator_oib="12312312316",
+        )
+        client = Mock()
+        with pytest.raises(ValueError, match="regular_hours or exceptions"):
+            bp.to_batch_ws_object(client)
 
 
 class TestEnums:

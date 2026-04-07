@@ -77,10 +77,10 @@
     <wsdl:part element="fis:PrijaviRadnoVrijemeOdgovor" name="response"/>
   </wsdl:message>
 
-  <wsdl:message name="BrisiRadnoVrijemeRequest">
+  <wsdl:message name="ObrisiRadnoVrijemeRequest">
     <wsdl:part element="fis:ObrisiRadnoVrijemeZahtjev" name="request"/>
   </wsdl:message>
-  <wsdl:message name="BrisiRadnoVrijemeResponse">
+  <wsdl:message name="ObrisiRadnoVrijemeResponse">
     <wsdl:part element="fis:ObrisiRadnoVrijemeOdgovor" name="response"/>
   </wsdl:message>
 
@@ -135,9 +135,9 @@
       <wsdl:input message="uis:PrijaviRadnoVrijemeRequest"/>
       <wsdl:output message="uis:PrijaviRadnoVrijemeResponse"/>
     </wsdl:operation>
-    <wsdl:operation name="brisiRadnoVrijeme">
-      <wsdl:input message="uis:BrisiRadnoVrijemeRequest"/>
-      <wsdl:output message="uis:BrisiRadnoVrijemeResponse"/>
+    <wsdl:operation name="obrisiRadnoVrijeme">
+      <wsdl:input message="uis:ObrisiRadnoVrijemeRequest"/>
+      <wsdl:output message="uis:ObrisiRadnoVrijemeResponse"/>
     </wsdl:operation>
     <wsdl:operation name="dohvatiRadnoVrijeme">
       <wsdl:input message="uis:DohvatiRadnoVrijemeRequest"/>
@@ -232,8 +232,8 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="brisiRadnoVrijeme">
-      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/brisiRadnoVrijeme"/>
+    <wsdl:operation name="obrisiRadnoVrijeme">
+      <soap:operation soapAction="http://e-porezna.porezna-uprava.hr/fiskalizacija/2012/services/FiskalizacijaService/obrisiRadnoVrijeme"/>
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>
