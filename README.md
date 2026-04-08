@@ -14,8 +14,6 @@ The package provides full integration with the Fiskalizacija service, including:
 
 * checking invoice details in test (DEMO) mode - `FiskalClient.check_invoice()`
 * submitting an invoice - `FiskalClient.submit_invoice()`
-* submitting an invoice with accompanying document (deprecated) - `FiskalClient.submit_invoice()` with `InvoiceWithDoc`
-* submitting a fiscalization document (deprecated) - `FiskalClient.submit_document()`
 * recipient OIB (`OibPrimateljaRacuna`) support for B2B cash/card transactions on `Invoice`
 
 ### Payment method and invoice data changes
