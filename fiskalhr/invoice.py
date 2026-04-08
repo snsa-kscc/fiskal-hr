@@ -780,5 +780,3 @@ class InvoiceTip(Invoice):
             nacinPlacanjaNapojnice=self.tip_payment_method,
         )
         return obj
-
-

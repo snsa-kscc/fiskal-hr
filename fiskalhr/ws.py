@@ -270,4 +270,3 @@ class FiskalClient:
                 OibOper=operator_oib,
             ),
         )
-
